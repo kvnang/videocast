@@ -37,12 +37,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>
-          <link
-            href="https://fonts.googleapis.com/css2?family=Quicksand:ital,wght@0,400;0,700;1,400&family=Autour+One&family=Inconsolata&display=swap"
-            rel="stylesheet"
-          />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />

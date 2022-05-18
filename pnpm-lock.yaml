@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@auth0/nextjs-auth0': ^1.8.0
+  '@fontsource/cabin': ^4.5.6
   '@fontsource/open-sans': ^4.5.8
   '@fontsource/poppins': ^4.5.8
   '@fontsource/source-sans-pro': ^4.5.9
@@ -52,6 +53,7 @@ specifiers:
 
 dependencies:
   '@auth0/nextjs-auth0': 1.8.0_next@12.1.6
+  '@fontsource/cabin': 4.5.6
   '@fontsource/open-sans': 4.5.10
   '@fontsource/poppins': 4.5.8
   '@fontsource/source-sans-pro': 4.5.9
@@ -1354,6 +1356,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@fontsource/cabin/4.5.6:
+    resolution: {integrity: sha512-pEHzI71EUgqSDykKs/fZj+SaQJIU1mU/QEqYmD5rNRecTXNlcf5Wub47rbEWtNRIBsik0mNozhyxONBmSlfewA==}
+    dev: false
 
   /@fontsource/open-sans/4.5.10:
     resolution: {integrity: sha512-MrtTDfWb1Tu9YxVh2KaKmsKBn6O3KL/lHZS0KRKK58jgqvdwuiDt4QW4udmW4FQf0XOWgnZ+4vKUF80F3SqBAA==}

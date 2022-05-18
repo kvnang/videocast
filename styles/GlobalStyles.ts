@@ -33,10 +33,10 @@ const documentStyles = () => styled.css`
     --transition: 0.3s ease;
     --box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
     --box-shadow-deep: 0 3px 6px rgba(0, 0, 0, 0.32);
-    --font-primary: 'Autour One', -apple-system, BlinkMacSystemFont, 'Georgia',
-      'Times New Roman', Times, serif;
-    --font-secondary: 'Quicksand', -apple-system, BlinkMacSystemFont,
-      'Helvetica', 'Arial', sans-serif;
+    --font-primary: 'League SpartanVariable', -apple-system, BlinkMacSystemFont,
+      'Georgia', 'Times New Roman', Times, serif;
+    --font-secondary: 'League SpartanVariable', -apple-system,
+      BlinkMacSystemFont, 'Helvetica', 'Arial', sans-serif;
     --font-size-body: 1rem;
     --font-size-small: 0.8rem;
     --section-spacing: 2.5rem;

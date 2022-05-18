@@ -11,8 +11,8 @@ module.exports = {
         padding: '1rem',
       },
       fontFamily: {
-        sans: ['Quicksand', ...defaultTheme.fontFamily.sans],
-        display: ['Autour One', ...defaultTheme.fontFamily.serif],
+        sans: ['CabinVariable', ...defaultTheme.fontFamily.sans],
+        display: ['CabinVariable', ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
         progress: {

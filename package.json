@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.8.0",
+    "@fontsource/cabin": "^4.5.6",
     "@fontsource/open-sans": "^4.5.8",
     "@fontsource/poppins": "^4.5.8",
     "@fontsource/source-sans-pro": "^4.5.9",

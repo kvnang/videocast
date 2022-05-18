@@ -36,12 +36,12 @@ export default function Button({
       <Link href={href}>
         <a className={`${defaultClassName} ${className}`} {...props}>
           {(loading && (
-            <span className="flex items-center gap-2 font-bold relative pl-6 ">
+            <span className="flex items-center gap-2 font-semibold text-base relative pl-6 ">
               <Spinner className="absolute left-0 top-1/2 -translate-y-[50%] h-4 w-4" />
               {loadingText || children}
             </span>
           )) || (
-            <span className="flex items-center gap-2 font-bold">
+            <span className="flex items-center gap-2 font-semibold text-base">
               {icon && <span>{icon}</span>}
               {children}
             </span>
@@ -57,12 +57,12 @@ export default function Button({
       {...props}
     >
       {(loading && (
-        <span className="flex items-center gap-2 font-bold relative pl-6 ">
+        <span className="flex items-center gap-2 font-semibold text-base relative pl-6 ">
           <Spinner className="absolute left-0 top-1/2 -translate-y-[50%] h-4 w-4" />
           {loadingText || children}
         </span>
       )) || (
-        <span className="flex items-center gap-2 font-bold">
+        <span className="flex items-center gap-2 font-semibold text-base">
           {icon && <span>{icon}</span>}
           {children}
         </span>

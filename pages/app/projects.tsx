@@ -37,32 +37,40 @@ export default function ProjectsPage() {
       <section className="container mx-auto mb-16">
         <h1 className="text-3xl font-bold font-display">My Projects</h1>
       </section>
-      <section className="container mx-auto mb-16">
-        <h1 className="text-2xl font-bold mb-8">Draft</h1>
-        <div className="grid grid-cols-4 gap-4">
-          {draftProjects.map((project) => (
-            <ProjectTile
-              key={project._id}
-              project={project}
-              userID={user?.sub}
-              refetch={fetchProjects}
-            />
-          ))}
-        </div>
-      </section>
-      <section className="container mx-auto mb-16">
-        <h1 className="text-2xl font-bold mb-8">Published</h1>
-        <div className="grid grid-cols-4 gap-4">
-          {publishedProjects.map((project) => (
-            <ProjectTile
-              key={project._id}
-              project={project}
-              userID={user?.sub}
-              refetch={fetchProjects}
-            />
-          ))}
-        </div>
-      </section>
+      {!!draftProjects?.length && (
+        <section className="container mx-auto mb-16">
+          <h2 className="text-xl font-bold mb-8 pb-2 border-b-2 border-b-slate-800">
+            Draft
+          </h2>
+          <div className="grid grid-cols-4 gap-4">
+            {draftProjects.map((project) => (
+              <ProjectTile
+                key={project._id}
+                project={project}
+                userID={user?.sub}
+                refetch={fetchProjects}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      {!!publishedProjects?.length && (
+        <section className="container mx-auto mb-16">
+          <h2 className="text-xl font-bold mb-8 pb-2 border-b-2 border-b-slate-800">
+            Published
+          </h2>
+          <div className="grid grid-cols-4 gap-4">
+            {publishedProjects.map((project) => (
+              <ProjectTile
+                key={project._id}
+                project={project}
+                userID={user?.sub}
+                refetch={fetchProjects}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

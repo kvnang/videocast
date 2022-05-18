@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import GlobalStyles from '../styles/GlobalStyles';
 import SEO from './Seo';
 
 const rotate = keyframes`
@@ -11,8 +10,6 @@ const rotate = keyframes`
     transform: rotate(359deg);
   }
 `;
-
-const MainStyles = styled.main``;
 
 const LoadingDivStyles = styled.div`
   position: absolute;

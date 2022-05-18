@@ -105,7 +105,7 @@ export default function Header() {
                       <li key={item.title}>
                         <Link href={item.href}>
                           <a
-                            className="py-1 px-3 inline-block rounded-md hover:bg-indigo-600 transition-colors"
+                            className="py-1 px-3 inline-block rounded-md hover:bg-indigo-600 transition-colors font-semibold"
                             aria-current={isCurrent ? 'page' : 'false'}
                           >
                             {item.title}

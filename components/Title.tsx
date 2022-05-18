@@ -1,21 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const TitleStyles = styled.section`
-  text-align: center;
-
-  .beta {
-    padding: 0.25rem 0.5rem;
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-    text-transform: uppercase;
-    font-weight: 600;
-    border-radius: 0.25rem;
-    display: inline-block;
-    margin-bottom: 0.25rem;
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
-  }
-`;
 
 export default function Title() {
   return (

@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 // import { StylesProps } from '../../components/forms/StylesForm';
 import clientPromise from '../../lib/mongodb';
-import { ProjectDocument } from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -87,7 +86,7 @@ export default async function handler(
       if (_id) {
         const result = await collection.findOne({
           ...params,
-          _id: new ObjectId(_id),
+          _id: new ObjectId(_id as string),
         });
         res.status(200).json(result);
       } else {
