@@ -27,7 +27,8 @@ export function absolutizeUrl(url: string) {
   if (!isAbsoluteUrl(url)) {
     const host =
       process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_VERCEL_URL || '';
-    return `${untrailingSlashIt(host)}/${url}`;
+    const hostWithHttp = host.startsWith('http') ? host : `https://${host}`;
+    return `${untrailingSlashIt(hostWithHttp)}/${url}`;
   }
 
   return url;
