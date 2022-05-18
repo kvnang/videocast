@@ -81,7 +81,7 @@ export default async function handler(
     );
 
     // Cleanup
-    fs.rmdir(tempDir, { recursive: true }, () => {});
+    fs.rmSync(tempDir, { recursive: true });
 
     // Response
     res.status(200).json(publicUrls);

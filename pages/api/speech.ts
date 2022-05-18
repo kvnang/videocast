@@ -5,8 +5,9 @@ import path from 'path';
 import os from 'os';
 import speech from '@google-cloud/speech';
 import { IncomingForm } from 'formidable';
+// import type { google } from '@google-cloud/speech/build/protos/protos';
 import { sampleResponse } from '../../utils/sampleResponse2';
-import { GoogleRecognitionResponse } from '../../types';
+// import { GoogleRecognitionResponse } from '../../types';
 
 interface ErrorResponse {
   errorMessage: string;
@@ -71,7 +72,7 @@ export default async function handler(
         reject(error);
       } finally {
         // 2c. Cleanup temp folder
-        fs.rmdir(tempDir, { recursive: true }, () => {});
+        fs.rmSync(tempDir, { recursive: true });
         console.log(`Temp dir cleanup: ${tempDir}`);
       }
     });
