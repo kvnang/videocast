@@ -441,8 +441,8 @@ export default function EditProject({
                 </div>
               </div>
             </section>
-            <section className="fixed bottom-10 right-10 z-10">
-              <div className="flex gap-4">
+            <section className="container mx-auto mt-8 mb-16">
+              <div className="flex justify-end gap-4">
                 <Button
                   icon={<IoSaveOutline />}
                   buttonStyle="secondary"
