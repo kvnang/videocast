@@ -82,6 +82,7 @@ export default async function handler(
     maxRetries: 1,
     framesPerLambda: 20,
     privacy: 'public',
+    quality: 100,
   });
   console.timeEnd('renderMediaOnLambda');
 
