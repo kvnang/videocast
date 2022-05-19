@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { FiDownloadCloud, FiEdit, FiTrash } from 'react-icons/fi';
+import { IoCopyOutline } from 'react-icons/io5';
 import { ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
 
@@ -47,21 +48,28 @@ export function ProjectTile({
         >
           <FiTrash title="Delete Project" />
         </button>
-        {(project.outputFile && (
-          <a
-            download
-            href={project.outputFile}
-            className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
-          >
-            <FiDownloadCloud title="Download" />
-          </a>
-        )) || (
-          <Link href={`/app/create/${project._id}`}>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/app/create?newDraft=${project._id}`}>
             <a className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors">
-              <FiEdit title="Edit Project" />
+              <IoCopyOutline title="New Draft" />
             </a>
           </Link>
-        )}
+          {(project.outputFile && (
+            <a
+              download
+              href={project.outputFile}
+              className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
+            >
+              <FiDownloadCloud title="Download" />
+            </a>
+          )) || (
+            <Link href={`/app/create/${project._id}`}>
+              <a className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors">
+                <FiEdit title="Edit Project" />
+              </a>
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

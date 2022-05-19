@@ -23,7 +23,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const session = getSession(req, res);
   const queryId = query.id;
+  const newDraftId = query.newDraft;
+
   const _id = queryId && Array.isArray(queryId) ? queryId[0] : queryId;
+  const newDraft =
+    newDraftId && Array.isArray(newDraftId) ? newDraftId[0] : newDraftId;
 
   if (!session?.user) {
     return {
@@ -44,6 +48,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     if (project && Object.keys(project)?.length) {
       return {
         props: { project, user: session.user },
+      };
+    }
+  }
+
+  if (newDraft) {
+    const project = await getProject(newDraft, session.user.sub);
+    const { _id, ...newProject } = project;
+
+    if (project && Object.keys(project)?.length) {
+      return {
+        props: { project: newProject, user: session.user },
       };
     }
   }
