@@ -1,5 +1,5 @@
 {
-  "name": "videocast",
+  "name": "@videocast/worker",
   "version": "1.0.0",
   "description": "Videocast Cloudflare R2 Wroker",
   "main": "dist/worker.js",
