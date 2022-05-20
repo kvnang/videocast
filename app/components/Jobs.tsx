@@ -20,7 +20,7 @@ export default function Jobs({ jobs }: { jobs: JobProps[] }) {
                 >
                   <div
                     className={`absolute h-full w-[200%] top-0 right-0 bg-stripes-accent ${
-                      job.progress && job.progress < 100
+                      !!job.progress && job.progress < 100
                         ? 'animate-[progress_25s_linear_infinite]'
                         : ''
                     }`}
@@ -30,10 +30,10 @@ export default function Jobs({ jobs }: { jobs: JobProps[] }) {
               <p className="text-center mt-4">
                 <span
                   className={`relative ${
-                    job.progress && job.progress < 100 ? 'pl-6' : ''
+                    !!job.progress && job.progress < 100 ? 'pl-6' : ''
                   }`}
                 >
-                  {job.progress && job.progress < 100 && (
+                  {!!job.progress && job.progress < 100 && (
                     <Spinner className="absolute left-0 top-1/2 -translate-y-[50%] h-4 w-4" />
                   )}
                   <span
