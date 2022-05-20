@@ -1,0 +1,10 @@
+# next.js
+.next/
+out/
+
+# production
+build/
+
+# remotion
+public/remotion.json
+public/sample/

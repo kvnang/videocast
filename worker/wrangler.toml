@@ -1,0 +1,12 @@
+name = "videocast"
+compatibility_date = "2022-05-18"
+account_id = "7ea3718fc0fd423e23c700b0ee874b57" # ← Replace with your Account ID.
+workers_dev = true
+main = "./dist/worker.js" 
+
+[build]
+command = "pnpm run build"
+
+[[r2_buckets]]
+binding = "MY_BUCKET" # <~ valid JavaScript variable name
+bucket_name = "videocast"

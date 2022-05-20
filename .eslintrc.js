@@ -1,24 +1,8 @@
 module.exports = {
   extends: ['airbnb', 'prettier'],
-  // parser: '@babel/eslint-parser',
-  // parserOptions: {
-  //   requireConfigFile: false,
-  //   babelOptions: {
-  //     presets: ['@babel/preset-react'],
-  //   },
-  // },
-
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    requireConfigFile: false,
-    ecmaVersion: 2020,
-    // Can I remove these now?
-    ecmaFeatures: {
-      impliedStrict: true,
-      classes: true,
-      jsx: true,
-    },
-    sourceType: 'module',
+    project: ['**/*/tsconfig.json'],
   },
   settings: {
     'import/resolver': {
@@ -44,13 +28,6 @@ module.exports = {
       'ForInStatement',
       'LabeledStatement',
       'WithStatement',
-    ],
-    'no-unused-vars': [
-      1,
-      {
-        ignoreRestSiblings: true,
-        argsIgnorePattern: 'res|next|^err',
-      },
     ],
     'prefer-const': [
       'error',
@@ -136,10 +113,27 @@ module.exports = {
     // note you must disable the base rule as it can report incorrect errors
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
+    // note you must disable the base rule as it can report incorrect errors
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        ignoreRestSiblings: true,
+        argsIgnorePattern: 'res|next|^err',
+      },
+    ],
   },
   globals: {
     React: true,
     JSX: true,
   },
+  overrides: [
+    {
+      files: ['*.ts'],
+      rules: {
+        'no-undef': 'off',
+      },
+    },
+  ],
   plugins: ['html', 'prettier', 'react-hooks', '@typescript-eslint'],
 };
