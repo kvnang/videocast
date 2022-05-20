@@ -30,7 +30,7 @@ export default async function handler(
   // Upload to R2
   const remoteFile = await uploadFileToR2(
     arrayBuffer,
-    fileName || getFileName(url) || Date.now()
+    fileName || getFileName(url, true) || Date.now()
   );
   res.status(200).json({ url: remoteFile });
 }

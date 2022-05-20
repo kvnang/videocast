@@ -83,7 +83,10 @@ export async function uploadFile(fileList: FileList) {
   return json;
 }
 
-export function getFileName(url: string) {
+export function getFileName(url: string, keepExtension?: boolean) {
+  if (keepExtension) {
+    return url.substring(url.lastIndexOf('/') + 1);
+  }
   return url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('.'));
 }
 

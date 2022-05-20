@@ -8,7 +8,7 @@ import { uploadFileToR2 } from '../../lib/cloudflare';
 import { getFileName } from '../../utils/helpers';
 
 async function uploadFile(filePath: string) {
-  const fileName = getFileName(filePath); // Get the file name only without its directories
+  const fileName = getFileName(filePath, true); // Get the file name only without its directories
   const buffer = fs.readFileSync(filePath);
   const arrayBuffer = Uint8Array.from(buffer).buffer;
 
