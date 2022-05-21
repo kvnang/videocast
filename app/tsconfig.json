@@ -1,12 +1,7 @@
 {
-  "include": [
-    "**/*",
-    "**/.*"
-  ],
+  "include": ["**/*", "**/.*"],
   "compilerOptions": {
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     // What should we export the code as?
     "target": "ES5",
     // What types of modules should we use?
@@ -60,11 +55,7 @@
     // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -74,7 +65,5 @@
     "isolatedModules": true,
     "incremental": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

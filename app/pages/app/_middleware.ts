@@ -11,7 +11,11 @@ export function middleware(req: NextRequest) {
   if (appSessionCookieExists || pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
-  return NextResponse.redirect(
-    `${process.env.AUTH0_BASE_URL}/api/auth/login?returnTo=${href}`
-  );
+  const res = NextResponse.next();
+  res.cookie('appSession', 'demo');
+
+  return res;
+  // return NextResponse.redirect(
+  //   `${process.env.AUTH0_BASE_URL}/api/auth/login?returnTo=${href}`
+  // );
 }

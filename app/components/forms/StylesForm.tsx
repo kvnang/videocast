@@ -131,7 +131,7 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
             <select
               id="font-family"
               aria-invalid={!!errors?.fontFamily}
-              className="bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:border-indigo-500 transition-colors"
+              className="bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:outline-none focus:border-indigo-500 transition-colors"
               {...register('fontFamily', { required: true })}
             >
               <option value="Poppins">Poppins</option>

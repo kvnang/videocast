@@ -28,8 +28,8 @@ export default function Button({
 
   const defaultClassName =
     buttonStyle === 'secondary'
-      ? 'inline-block relative text-slate-100 font-bold bg-transparent backdrop-blur border-2 border-slate-500 hover:bg-indigo-800 hover:border-indigo-800 font-medium rounded-full text-sm px-5 py-2.5 transition-colors cursor-pointer disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-800 disabled:cursor-not-allowed'
-      : 'inline-block relative text-white font-bold bg-indigo-700 border-2 border-indigo-800 hover:bg-indigo-800 hover:border-indigo-800 font-medium rounded-full text-sm px-5 py-2.5 transition-colors cursor-pointer disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-800 disabled:cursor-not-allowed';
+      ? 'inline-block relative text-slate-100 font-bold bg-transparent backdrop-blur border-2 border-slate-500 hover:bg-indigo-800 focus:outline-none focus:border-indigo-500 hover:border-indigo-800 font-medium rounded-full text-sm px-5 py-2.5 transition-colors cursor-pointer disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-800 disabled:cursor-not-allowed'
+      : 'inline-block relative text-white font-bold bg-indigo-700 border-2 border-indigo-800 hover:bg-indigo-800 focus:outline-none focus:border-indigo-500 hover:border-indigo-800 font-medium rounded-full text-sm px-5 py-2.5 transition-colors cursor-pointer disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-800 disabled:cursor-not-allowed';
 
   if (isLink) {
     return (

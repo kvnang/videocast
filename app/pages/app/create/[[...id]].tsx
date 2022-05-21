@@ -30,6 +30,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     newDraftId && Array.isArray(newDraftId) ? newDraftId[0] : newDraftId;
 
   if (!session?.user) {
+    if (req.cookies.appSession === 'demo') {
+      return {
+        props: {
+          user: {
+            sub: 'demo|1234567890',
+          },
+        },
+      };
+    }
+
     return {
       redirect: {
         permanent: false,

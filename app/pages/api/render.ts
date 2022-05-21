@@ -1,5 +1,6 @@
 import { getFunctions, renderMediaOnLambda } from '@remotion/lambda';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getRenderData } from '../../lib/cloudflare';
 import { region, compositionId } from '../../lib/config';
 import { absolutizeUrl } from '../../utils/helpers';
 
@@ -23,10 +24,11 @@ export default async function handler(
 
   const { styles, words, audio, audioDuration, image, outName } = body;
 
-  const fileContent = await fetch(absolutizeUrl(`/remotion.json`)).then((r) =>
-    r.text()
-  );
-  const { serveUrl, bucketName } = JSON.parse(fileContent);
+  // const fileContent = await fetch(absolutizeUrl(`/remotion.json`)).then((r) =>
+  //   r.text()
+  // );
+
+  const { serveUrl, bucketName } = await getRenderData();
 
   const inputProps = {
     styles,

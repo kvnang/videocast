@@ -522,6 +522,13 @@ export default function EditProject({
             <Jobs jobs={[job]} />
           </section>
         )}
+        {user.sub.startsWith('demo|') && (
+          <section className="bg-indigo-500 fixed top-0 right-0 w-full rotate-45">
+            <div className="container mx-auto py-1 text-center">
+              <span className="font-bold">DEMO</span>
+            </div>
+          </section>
+        )}
       </main>
     </>
   );

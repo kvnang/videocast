@@ -28,7 +28,7 @@ export function InputField({
       </span>
       <div className="relative">
         <input
-          className={`bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:border-indigo-500 invalid:border-red-500 transition-colors ${
+          className={`bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:outline-none focus:border-indigo-500 invalid:border-red-500 transition-colors ${
             icon ? 'pr-9' : ''
           }`}
           {...props}

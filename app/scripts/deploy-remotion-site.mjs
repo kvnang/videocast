@@ -1,16 +1,43 @@
 import { deploySite, getOrCreateBucket } from '@remotion/lambda';
 import path from 'node:path';
 import dotenv from 'dotenv';
-import fs from 'fs';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
 const region = 'us-east-1';
 
+async function saveRenderData({ bucketName, serveUrl }) {
+  console.log('Saving bucketName and serveUrl to KV');
+
+  if (!process.env.CF_WORKER_URL) {
+    throw new Error('Cloudflare Worker URL is not defined');
+  }
+
+  if (!process.env.CF_AUTH_SECRET) {
+    throw new Error('Cloudflare Worker authentication failed');
+  }
+
+  try {
+    await fetch(`${process.env.CF_WORKER_URL}/render/renderData`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cf-Auth': process.env.CF_AUTH_SECRET || '',
+      },
+      body: JSON.stringify({ value: JSON.stringify({ bucketName, serveUrl }) }),
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function deploy() {
   const { bucketName } = await getOrCreateBucket({
     region,
   });
+
+  console.log('Bundling site ...');
 
   const { serveUrl } = await deploySite({
     entryPoint: path.resolve(process.cwd(), './remotion/index'),
@@ -27,21 +54,16 @@ async function deploy() {
         totalSize,
         sizeUploaded,
       }) => {
-        // console.log(
-        //   `Upload progress: Total files ${totalFiles}, Files uploaded ${filesUploaded}, Total size ${totalSize}, Size uploaded ${sizeUploaded}`
-        // );
-        // job.progress(10 + (filesUploaded / totalFiles) * 30);
-        // job.update({
-        //   message: `Uploading bundle ${filesUploaded} / ${totalFiles} files uploaded`,
-        // });
+        console.log(
+          `Upload progress: Files uploaded ${filesUploaded} / ${totalFiles} (${sizeUploaded} / ${totalSize})`
+        );
       },
     },
   });
 
-  fs.writeFileSync(
-    './public/remotion.json',
-    JSON.stringify({ bucketName, serveUrl })
-  );
+  await saveRenderData({ bucketName, serveUrl });
+
+  console.log('🎉 Done!');
 }
 
 deploy();
