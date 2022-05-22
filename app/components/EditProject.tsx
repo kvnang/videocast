@@ -305,7 +305,8 @@ export default function EditProject({
       progress: 100,
       state: 'done',
       data: {
-        message: `🎉  Video uploaded to <a href="${url}" target="_blank" class="inline-link">${url}</a>`,
+        message: `🎉  Video rendered successfully`,
+        url,
       },
     });
 
@@ -517,14 +518,24 @@ export default function EditProject({
             </section>
           </div>
         )}
+        {/* <Jobs
+          jobs={[
+            {
+              id: 1,
+              state: 'progress',
+              progress: 10,
+              data: { message: 'Testing' },
+            },
+          ]}
+        /> */}
         {job && (
           <section className="container mx-auto mb-16">
             <Jobs jobs={[job]} />
           </section>
         )}
         {user.sub.startsWith('demo|') && (
-          <section className="bg-indigo-500 fixed top-0 right-0 w-full rotate-45">
-            <div className="container mx-auto py-1 text-center">
+          <section className="bg-indigo-500 fixed bottom-8 right-8 w-96 -rotate-45 translate-x-[50%] translate-y-[50%]">
+            <div className="py-1 text-center">
               <span className="font-bold">DEMO</span>
             </div>
           </section>

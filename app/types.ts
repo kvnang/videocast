@@ -90,5 +90,8 @@ export interface JobProps {
   state: string;
   progress?: number;
   reason?: string;
-  data?: { message?: string };
+  data?: {
+    message?: string;
+    [key: string]: string | number | undefined | null;
+  };
 }
