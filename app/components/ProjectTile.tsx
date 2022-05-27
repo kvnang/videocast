@@ -58,7 +58,7 @@ export function ProjectTile({
         <button
           type="button"
           onClick={handleDeleteClick}
-          className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors text-red-500 hover:bg-red-700 hover:text-red-100 "
+          className="inline-flex p-2 h-8 w-8 bg-slate-900 align-items-center justify-center rounded-md transition-colors text-red-500 hover:bg-red-700 hover:text-red-100 "
           disabled={isLoading}
         >
           <FiTrash title="Delete Project" className="h-4 w-4" />

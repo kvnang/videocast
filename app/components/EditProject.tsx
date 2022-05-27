@@ -41,12 +41,10 @@ export default function EditProject({
   project,
   user,
   setProject,
-  setProjectStatus,
 }: {
   project?: ProjectDocument | null;
   user: Claims;
   setProject: (v: ProjectDocument | null) => void;
-  setProjectStatus: (v: ProjectStatus | undefined) => void;
 }) {
   const defaultProps = project?.inputProps;
   const userID = user.sub;

@@ -3,7 +3,7 @@ import { Claims, getSession } from '@auth0/nextjs-auth0';
 import type { GetServerSideProps } from 'next';
 import EditProject from '../../../components/EditProject';
 import { getProject } from '../../../lib/project';
-import { ProjectDocument, ProjectStatus } from '../../../types';
+import { ProjectDocument } from '../../../types';
 import { absolutizeUrl } from '../../../utils/helpers';
 import SEO from '../../../components/Seo';
 import ViewProject from '../../../components/ViewProject';
@@ -18,9 +18,9 @@ export default function CreatePage({
   const [project, setProject] = React.useState<ProjectDocument | null>(
     _project || null
   );
-  const [projectStatus, setProjectStatus] = React.useState<
-    ProjectStatus | undefined
-  >(project?.outputFile ? 'done' : project?.status || undefined);
+  const projectStatus = project?.outputFile
+    ? 'done'
+    : project?.status || undefined;
 
   const isDraft = !project || !projectStatus;
 
@@ -29,12 +29,7 @@ export default function CreatePage({
       <SEO />
       <main>
         {(!isDraft && <ViewProject project={project} />) || (
-          <EditProject
-            project={project}
-            user={user}
-            setProject={setProject}
-            setProjectStatus={setProjectStatus}
-          />
+          <EditProject project={project} user={user} setProject={setProject} />
         )}
       </main>
     </>

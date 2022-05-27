@@ -8,7 +8,6 @@ export default function ProjectsPage() {
   const { user } = useUser();
 
   const [projects, setProjects] = React.useState<ProjectDocument[]>([]);
-  const [loading, setLoading] = React.useState(true);
 
   const fetchProjects = async () => {
     if (!user?.sub) {
@@ -19,7 +18,6 @@ export default function ProjectsPage() {
       .then((res) => res.json())
       .then((data: ProjectDocument[]) => {
         setProjects(data);
-        setLoading(false);
       });
   };
 
