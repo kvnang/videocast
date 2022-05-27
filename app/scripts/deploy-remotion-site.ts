@@ -42,7 +42,9 @@ async function saveRenderData({
         'Content-Type': 'application/json',
         'X-Cf-Auth': process.env.CF_AUTH_SECRET || '',
       },
-      body: JSON.stringify({ value: JSON.stringify({ bucketName, serveUrl }) }),
+      body: JSON.stringify({
+        value: JSON.stringify({ bucketName, serveUrl, functionName }),
+      }),
     });
   } catch (err) {
     console.error(err);
