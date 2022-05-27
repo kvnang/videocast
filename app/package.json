@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build && npm run postbuild",
     "start": "next start",
-    "postbuild": "node scripts/deploy-remotion-site.mjs",
+    "postbuild": "npx esno scripts/deploy-remotion-site.ts",
     "serve": "next serve",
     "functions": "remotion lambda functions deploy"
   },

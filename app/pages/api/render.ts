@@ -1,8 +1,7 @@
-import { getFunctions, renderMediaOnLambda } from '@remotion/lambda';
+import { renderMediaOnLambda } from '@remotion/lambda';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getRenderData } from '../../lib/cloudflare';
 import { region, compositionId } from '../../lib/config';
-import { absolutizeUrl } from '../../utils/helpers';
 
 type Data = {
   serveUrl?: string;
@@ -24,11 +23,7 @@ export default async function handler(
 
   const { styles, words, audio, audioDuration, image, outName } = body;
 
-  // const fileContent = await fetch(absolutizeUrl(`/remotion.json`)).then((r) =>
-  //   r.text()
-  // );
-
-  const { serveUrl, bucketName } = await getRenderData();
+  const { serveUrl, bucketName, functionName } = await getRenderData();
 
   const inputProps = {
     styles,
@@ -37,21 +32,6 @@ export default async function handler(
     image,
     words,
   };
-
-  // console.time('getFunctions');
-  const functions = await getFunctions({
-    region,
-    compatibleOnly: true,
-  });
-  // console.timeEnd('getFunctions');
-
-  if (!functions.length) {
-    throw new Error(
-      'No (compatible) functions found. Please ensure that the function deployed has the same version, or redeploy a new one.'
-    );
-  }
-
-  const { functionName } = functions[0];
 
   // console.time('renderMediaOnLambda');
   const { renderId } = await renderMediaOnLambda({

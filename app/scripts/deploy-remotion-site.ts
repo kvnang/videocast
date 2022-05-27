@@ -1,6 +1,10 @@
 import {
+  AwsRegion,
+  deleteFunction,
   deleteSite,
+  deployFunction,
   deploySite,
+  getFunctions,
   getOrCreateBucket,
   getSites,
 } from '@remotion/lambda';
@@ -10,9 +14,17 @@ import fetch from 'node-fetch';
 
 dotenv.config();
 
-const region = 'us-east-1';
+const region: AwsRegion = 'us-east-1';
 
-async function saveRenderData({ bucketName, serveUrl }) {
+async function saveRenderData({
+  bucketName,
+  serveUrl,
+  functionName,
+}: {
+  bucketName: string;
+  serveUrl: string;
+  functionName: string;
+}) {
   console.log('Saving bucketName and serveUrl to KV');
 
   if (!process.env.CF_WORKER_URL) {
@@ -52,6 +64,20 @@ async function deleteSites() {
   }
 }
 
+async function deleteFunctions() {
+  const functions = await getFunctions({
+    region: 'us-east-1',
+    compatibleOnly: false,
+  });
+  for (const fn of functions) {
+    await deleteFunction({
+      region: 'us-east-1',
+      functionName: fn.functionName,
+    });
+    console.log(`Function ${fn.functionName} deleted.`);
+  }
+}
+
 async function deploy() {
   console.log('Deleting sites ...');
   await deleteSites();
@@ -84,7 +110,21 @@ async function deploy() {
     },
   });
 
-  await saveRenderData({ bucketName, serveUrl });
+  console.log('Deleting functions ...');
+
+  await deleteFunctions();
+
+  // @see https://www.remotion.dev/docs/lambda/deployfunction
+  const { functionName } = await deployFunction({
+    region,
+    timeoutInSeconds: 120,
+    memorySizeInMb: 1024,
+    createCloudWatchLogGroup: true,
+    architecture: 'arm64',
+    diskSizeInMb: 512,
+  });
+
+  await saveRenderData({ bucketName, serveUrl, functionName });
 
   console.log('🎉 Done!');
 }
