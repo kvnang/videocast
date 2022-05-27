@@ -1,4 +1,9 @@
-import { deploySite, getOrCreateBucket } from '@remotion/lambda';
+import {
+  deleteSite,
+  deploySite,
+  getOrCreateBucket,
+  getSites,
+} from '@remotion/lambda';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
@@ -32,7 +37,25 @@ async function saveRenderData({ bucketName, serveUrl }) {
   }
 }
 
+async function deleteSites() {
+  const { sites } = await getSites({
+    region,
+  });
+
+  for (const site of sites) {
+    await deleteSite({
+      bucketName: site.bucketName,
+      siteName: site.id,
+      region,
+    });
+    console.log(`Site ${site.id} deleted.`);
+  }
+}
+
 async function deploy() {
+  console.log('Deleting sites ...');
+  await deleteSites();
+
   const { bucketName } = await getOrCreateBucket({
     region,
   });
