@@ -41,6 +41,7 @@ export function ProjectTile({
   };
 
   const isDraft = !project.status && !project.outputFile;
+  const isProcessing = project.status === 'processing' && !project.outputFile;
   const isDone = project.status === 'done' && project.outputFile;
 
   return (
@@ -76,17 +77,18 @@ export function ProjectTile({
               )}
             </a>
           </Link>
-          <a
-            download
-            href={project.outputFile || '#'}
-            className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
-          >
-            {isDone ? (
-              <FiDownloadCloud title="Download" className="h-4 w-4" />
-            ) : (
-              <Spinner className="h-4 w-4 opacity-50" />
-            )}
-          </a>
+          {(isDone || isProcessing) && (
+            <a
+              download
+              href={project.outputFile || '#'}
+              className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
+            >
+              {isDone && (
+                <FiDownloadCloud title="Download" className="h-4 w-4" />
+              )}
+              {isProcessing && <Spinner className="h-4 w-4 opacity-50" />}
+            </a>
+          )}
         </div>
       </div>
     </div>
