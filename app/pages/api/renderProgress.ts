@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { getRenderProgress } from '@remotion/lambda';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { convertS3toR2 } from '../../lib/cloudflare';
 
 type Data = {
   isSettled: boolean;
@@ -38,7 +39,9 @@ export default async function handler(
     if (progress.done) {
       console.log('Render finished!', progress.outputFile);
       isSettled = true;
-      outputFile = progress.outputFile;
+      outputFile = progress.outputFile
+        ? convertS3toR2(progress.outputFile)
+        : null;
     }
 
     if (progress.fatalErrorEncountered) {

@@ -29,48 +29,60 @@ export default function ProjectsPage() {
     }
   }, [user]);
 
-  const draftProjects = projects.filter((project) => !project.outputFile);
-  const publishedProjects = projects.filter((project) => project.outputFile);
+  const draftProjects = projects.filter(
+    (project) => !project.status && !project.outputFile
+  );
+
+  const renderingProjects = projects.filter(
+    (project) => project.status === 'processing'
+  );
+
+  const publishedProjects = projects.filter(
+    (project) => project.status === 'done' && project.outputFile
+  );
+
+  const sections = [
+    {
+      title: 'Draft',
+      items: draftProjects,
+    },
+    {
+      title: 'Rendering',
+      items: renderingProjects,
+    },
+    {
+      title: 'Published',
+      items: publishedProjects,
+    },
+  ];
 
   return (
     <main>
       <section className="container mx-auto mb-16">
         <h1 className="text-3xl font-bold font-display">My Projects</h1>
       </section>
-      {!!draftProjects?.length && (
-        <section className="container mx-auto mb-16">
-          <h2 className="text-xl font-bold mb-8 pb-2 border-b-2 border-b-slate-800">
-            Draft
-          </h2>
-          <div className="grid grid-cols-4 gap-4">
-            {draftProjects.map((project) => (
-              <ProjectTile
-                key={project._id}
-                project={project}
-                userID={user?.sub}
-                refetch={fetchProjects}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-      {!!publishedProjects?.length && (
-        <section className="container mx-auto mb-16">
-          <h2 className="text-xl font-bold mb-8 pb-2 border-b-2 border-b-slate-800">
-            Published
-          </h2>
-          <div className="grid grid-cols-4 gap-4">
-            {publishedProjects.map((project) => (
-              <ProjectTile
-                key={project._id}
-                project={project}
-                userID={user?.sub}
-                refetch={fetchProjects}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+      {sections.map((section) => {
+        if (!section.items?.length) {
+          return null;
+        }
+        return (
+          <section key={section.title} className="container mx-auto mb-16">
+            <h2 className="text-xl font-bold mb-8 pb-2 border-b-2 border-b-slate-800">
+              {section.title}
+            </h2>
+            <div className="grid grid-cols-4 gap-4">
+              {section.items.map((project) => (
+                <ProjectTile
+                  key={project._id}
+                  project={project}
+                  userID={user?.sub}
+                  refetch={fetchProjects}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </main>
   );
 }

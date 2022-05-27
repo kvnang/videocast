@@ -14,12 +14,30 @@ export interface StylesProps {
   subtitle?: string;
 }
 
+export interface InputProps {
+  fps: number;
+  styles: StylesProps;
+  words: WordProps;
+  audio: string;
+  image: string;
+  audioDuration: number;
+}
+
+export type ProjectStatus = 'processing' | 'done' | 'error';
+
+export interface RenderData {
+  renderId: string;
+  bucketName: string;
+  functionName: string;
+}
 export interface ProjectProps {
   _id?: string;
   userID?: string;
   title: string;
-  inputProps: any;
+  inputProps: InputProps;
   outputFile?: string;
+  status?: ProjectStatus | null;
+  renderData?: RenderData | null;
 }
 
 export interface ProjectDocument extends ProjectProps {

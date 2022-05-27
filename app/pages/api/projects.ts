@@ -36,6 +36,43 @@ export default async function handler(
     }
   }
 
+  if (req.method === 'DELETE') {
+    const body = JSON.parse(req.body);
+
+    if (!body) {
+      throw new Error('No data posted');
+    }
+
+    if (!body._id) {
+      throw new Error('No object ID is found');
+    }
+
+    if (!body.userID) {
+      throw new Error('No user ID provided');
+    }
+
+    const { _id, userID } = body;
+
+    try {
+      // Permanent Delete
+      // const result = await collection.deleteOne({
+      //   _id: new ObjectId(_id),
+      //   userID,
+      // });
+
+      // Temporary Delete
+      const result = await collection.updateOne(
+        { _id: new ObjectId(_id), userID },
+        { $set: { updatedAt: new Date(), trashed: true } }
+      );
+
+      res.status(200).json(result);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
   if (req.method === 'PUT' || req.method === 'PATCH') {
     const body = JSON.parse(req.body);
 
@@ -92,7 +129,7 @@ export default async function handler(
       } else {
         const result = await collection
           .find(params)
-          .sort({ date: -1 })
+          .sort({ updatedAt: -1 })
           .toArray();
         res.status(200).json(result);
       }

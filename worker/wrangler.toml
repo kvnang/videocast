@@ -5,7 +5,7 @@ workers_dev = true
 main = "./dist/worker.js" 
 
 kv_namespaces = [
-  { binding = "RENDER_KV", id = "5ad26fb081a644bebc5473c91ce25b59" }
+  { binding = "RENDER_KV", id = "5ad26fb081a644bebc5473c91ce25b59", preview_id = "781f4de2b83b4f839b46c71fc60e0441" }
 ]
 
 [build]
@@ -14,3 +14,4 @@ command = "pnpm run build"
 [[r2_buckets]]
 binding = "MY_BUCKET" # <~ valid JavaScript variable name
 bucket_name = "videocast"
+preview_bucket_name = "preview"

@@ -40,3 +40,15 @@ export async function getRenderData() {
 
   return json;
 }
+
+export function convertS3toR2(url: string) {
+  if (!process.env.CF_WORKER_URL) {
+    console.error('Cloudflare Worker URL is not defined');
+    return url;
+  }
+
+  return url.replace(
+    'https://s3.us-east-1.amazonaws.com',
+    `${process.env.CF_WORKER_URL}/storage`
+  );
+}

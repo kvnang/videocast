@@ -37,29 +37,34 @@ export default async function handler(
     keepExtensions: true,
   });
 
-  return form.parse(req, async (err, fields, files) => {
-    const publicUrls: Array<{ name: string | null; publicUrl: string }> = [];
+  const urls = await new Promise<{ name: string | null; publicUrl: string }[]>(
+    (resolve) => {
+      form.parse(req, async (err, fields, files) => {
+        const publicUrls: { name: string | null; publicUrl: string }[] = [];
 
-    // Loop over the files and upload them to GCS
-    await Promise.all(
-      Object.values(files).map(async (file) => {
-        const f = Array.isArray(file) ? file[0] : file;
-        const uploadUrl = await uploadFile(`${f.filepath}`);
-        if (uploadUrl) {
-          publicUrls.push({
-            name: f.newFilename,
-            publicUrl: uploadUrl,
-          });
-        }
-      })
-    );
+        // Loop over the files and upload them to GCS
+        await Promise.all(
+          Object.values(files).map(async (file) => {
+            const f = Array.isArray(file) ? file[0] : file;
+            const uploadUrl = await uploadFile(`${f.filepath}`);
+            if (uploadUrl) {
+              publicUrls.push({
+                name: f.newFilename,
+                publicUrl: uploadUrl,
+              });
+            }
+          })
+        );
 
-    // Cleanup
-    fs.rmSync(tempDir, { recursive: true });
+        // Cleanup
+        fs.rmSync(tempDir, { recursive: true });
 
-    // Response
-    res.status(200).json(publicUrls);
-  });
+        resolve(publicUrls);
+      });
+    }
+  );
+
+  res.status(200).json(urls);
 }
 
 export const config = {

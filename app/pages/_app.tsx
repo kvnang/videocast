@@ -20,8 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <UserProvider>
       <ModalProvider>
-        {/* <GlobalStyles /> */}
-        <NextNProgress color="#6366f1" showOnShallow />
+        <NextNProgress color="#6366f1" showOnShallow={false} />
         <Header />
         <Component {...pageProps} />
         <Modal />

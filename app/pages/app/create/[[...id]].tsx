@@ -1,18 +1,44 @@
+import * as React from 'react';
 import { Claims, getSession } from '@auth0/nextjs-auth0';
 import type { GetServerSideProps } from 'next';
 import EditProject from '../../../components/EditProject';
 import { getProject } from '../../../lib/project';
-import { ProjectDocument } from '../../../types';
+import { ProjectDocument, ProjectStatus } from '../../../types';
 import { absolutizeUrl } from '../../../utils/helpers';
+import SEO from '../../../components/Seo';
+import ViewProject from '../../../components/ViewProject';
 
 export default function CreatePage({
-  project,
+  project: _project,
   user,
 }: {
   project?: ProjectDocument | null;
   user: Claims;
 }) {
-  return <EditProject project={project} user={user} />;
+  const [project, setProject] = React.useState<ProjectDocument | null>(
+    _project || null
+  );
+  const [projectStatus, setProjectStatus] = React.useState<
+    ProjectStatus | undefined
+  >(project?.outputFile ? 'done' : project?.status || undefined);
+
+  const isDraft = !project || !projectStatus;
+
+  return (
+    <>
+      <SEO />
+      <main>
+        {(!isDraft && <ViewProject project={project} />) || (
+          <EditProject
+            project={project}
+            user={user}
+            setProject={setProject}
+            setProjectStatus={setProjectStatus}
+          />
+        )}
+      </main>
+    </>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -51,7 +77,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  if (_id) {
+  if (_id && _id !== 'new') {
     // 1. fetch project
     const project = await getProject(_id, session.user.sub);
 
@@ -64,9 +90,13 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   if (newDraft) {
     const project = await getProject(newDraft, session.user.sub);
-    const { _id, ...newProject } = project;
+    const newProject = {
+      userID: project.userID,
+      title: project.title,
+      inputProps: { ...project.inputProps },
+    };
 
-    if (project && Object.keys(project)?.length) {
+    if (newProject && Object.keys(newProject)?.length) {
       return {
         props: { project: newProject, user: session.user },
       };

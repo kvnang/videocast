@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 const menuItems = [
   {
     title: 'New Project',
-    href: '/app/create',
+    href: { pathname: '/app/create/[id]', query: { id: 'new' } },
   },
   {
     title: 'My Projects',

@@ -60,7 +60,7 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
         <InputField
           register={register}
           name="textColor"
-          label="Color"
+          label="Text Color"
           type="text"
           id="textColor"
           placeholder="#000000"
@@ -104,7 +104,7 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
         <InputField
           register={register}
           name="accentColor"
-          label="Color"
+          label="Accent Color"
           type="text"
           id="accentColor"
           placeholder="#000000"

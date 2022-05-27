@@ -1,7 +1,11 @@
+import { AwsClient } from 'aws4fetch';
+
 interface Env {
   MY_BUCKET: R2Bucket;
   CF_AUTH_SECRET: string;
   RENDER_KV: KVNamespace;
+  AWS_ACCESS_KEY_ID: string;
+  AWS_SECRET_ACCESS_KEY: string;
 }
 
 const corsHeaders = {
@@ -30,7 +34,11 @@ function unLeadingSlashIt(url: string) {
   return url.replace(/^\/+/, '');
 }
 
-async function handleStorage(request: Request, env: Env) {
+async function handleStorage(
+  request: Request,
+  env: Env,
+  ctx: EventContext<any, any, any>
+) {
   const url = new URL(request.url);
   const pathnames = unLeadingSlashIt(url.pathname).split('/');
   pathnames.shift();
@@ -51,9 +59,39 @@ async function handleStorage(request: Request, env: Env) {
       const object = await env.MY_BUCKET.get(objectName);
 
       if (!object) {
-        return new Response('Object Not Found', { status: 404 });
-      }
+        // 1. Try fetching from S3
 
+        // Signed request may not be necessary if the bucket is public
+        const aws = new AwsClient({
+          accessKeyId: env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+          service: 's3',
+          region: 'us-east-1',
+        });
+
+        const s3hostname = `https://s3.us-east-1.amazonaws.com`;
+
+        const signedRequest = await aws.sign(`${s3hostname}/${objectName}`);
+        const s3Object = await fetch(signedRequest);
+
+        if (!s3Object || s3Object.status === 404) {
+          return new Response('Object Not Found', { status: 404 });
+        }
+
+        const s3Body = s3Object.body?.tee();
+
+        if (!s3Body) {
+          return new Response('Object Not Found', { status: 404 });
+        }
+
+        ctx.waitUntil(
+          env.MY_BUCKET.put(objectName, s3Body[0], {
+            httpMetadata: s3Object.headers,
+          })
+        );
+
+        return new Response(s3Body[1], s3Object);
+      }
       return new Response(object.body, { headers: corsHeaders });
     }
     case 'DELETE':
@@ -104,7 +142,7 @@ async function handleRender(request: Request, env: Env) {
 }
 
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx: EventContext<any, any, any>) {
     if (!authorizeRequest(request, env)) {
       return new Response('Forbidden', { status: 403 });
     }
@@ -113,7 +151,7 @@ export default {
     const pathnames = unLeadingSlashIt(url.pathname).split('/');
 
     if (pathnames[0] === 'storage') {
-      return handleStorage(request, env);
+      return handleStorage(request, env, ctx);
     }
 
     if (pathnames[0] === 'render') {

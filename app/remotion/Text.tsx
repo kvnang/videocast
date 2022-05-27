@@ -5,6 +5,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
+import useDebounce from '../hooks/useDebounce';
 import { getWordTimeInSeconds } from '../utils/helpers';
 
 interface FrameProps {
@@ -41,10 +42,13 @@ export function Text({
 
   const [handle] = useState(() => delayRender());
 
+  const debouncedWords = useDebounce(words, 1000);
+
   useEffect(() => {
     const textContainer = textContainerRef.current;
 
-    function calculateFirstFrames() {
+    const calculateFirstFrames = () => {
+      console.log('recalc');
       const firstFrames: FrameProps = {};
 
       if (!textContainer) {
@@ -72,9 +76,9 @@ export function Text({
       }
 
       return firstFrames;
-    }
+    };
 
-    const timer1 = setTimeout(() => {
+    const timer = setTimeout(() => {
       const firstFrames = calculateFirstFrames();
       if (firstFrames) {
         setFirstFramesOfPage(firstFrames);
@@ -82,31 +86,10 @@ export function Text({
       continueRender(handle);
     }, 1000);
 
-    // ref.current = firstFrames;
-    // setFirstFramesOfPage(firstFrames);
-
     return () => {
-      clearTimeout(timer1);
+      clearTimeout(timer);
     };
-  }, [textContainerRef]);
-
-  // useEffect(() => {
-  //   if (firstFramesOfPage) {
-  //     if (firstFramesOfPage[frame]) {
-  //       const page = firstFramesOfPage[frame];
-  //       setTextScroll(
-  //         (firstFramesOfPage[frame] - 1) * (lines * lineHeight) * -1
-  //       );
-  //       // setPage();
-  //     }
-  //   }
-  // }, [frame]);
-
-  // useEffect(() => {
-  //   if (page) {
-  //     setTextScroll((page - 1) * (lines * lineHeight) * -1);
-  //   }
-  // }, [page]);
+  }, [debouncedWords]);
 
   const getCurrentPage = (framesData: FrameProps, frameNumber: number) => {
     if (!Object.keys(framesData).length) {

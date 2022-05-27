@@ -1,9 +1,10 @@
-import Link from 'next/link';
+import { useUser } from '@auth0/nextjs-auth0';
 import { IoColorWandOutline } from 'react-icons/io5';
 import Button from '../components/Button';
 import SEO from '../components/Seo';
 
 export default function HomePage() {
+  const { user, isLoading } = useUser();
   return (
     <main>
       <SEO />
@@ -19,9 +20,11 @@ export default function HomePage() {
             </p>
           </div>
           <div className="flex justify-end gap-2">
-            <Button href="/api/auth/login" buttonStyle="secondary">
-              Login
-            </Button>
+            {!user && !isLoading && (
+              <Button href="/api/auth/login" buttonStyle="secondary">
+                Login
+              </Button>
+            )}
             <Button href="/app/create" icon={<IoColorWandOutline />}>
               Start Creating
             </Button>
