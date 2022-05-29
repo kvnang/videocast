@@ -2,11 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import speech, { SpeechClient } from '@google-cloud/speech';
+import speech from '@google-cloud/speech';
 import { IncomingForm } from 'formidable';
-import { sampleResponse } from '../../utils/sampleResponse2';
 
-export type SpeechResponse = ReturnType<SpeechClient['longRunningRecognize']>;
+// TODO: clarify this type
+export type SpeechResponse = any;
 
 interface ErrorResponse {
   errorMessage: string;
@@ -29,15 +29,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SpeechResponse | ErrorResponse>
 ) {
-  console.time('speech');
   // 1. Save audio file to OS temp folder
   const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'stt-')); // stt: Speech-to-Text
   const form = new IncomingForm({
     uploadDir: tempDir,
     keepExtensions: true,
   });
-
-  console.timeEnd('speech');
 
   return new Promise((resolve, reject) => {
     // 2. Parse form & process audio
@@ -64,11 +61,9 @@ export default async function handler(
       };
 
       try {
-        console.time('recognize');
         // const [response] = await client.recognize(request);
         const [operation] = await client.longRunningRecognize(request);
         res.status(200).json(operation);
-        console.timeEnd('recognize');
         resolve(operation);
       } catch (error) {
         res.status(500).json({ errorMessage: 'Internal Server Error' });
