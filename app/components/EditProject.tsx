@@ -8,6 +8,7 @@ import {
 } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import type { google } from '@google-cloud/speech/build/protos/protos';
 import { PodcastVideo } from '../remotion/PodcastVideo';
 import Form from './Form';
 import AudioForm from './forms/AudioForm';
@@ -34,6 +35,8 @@ import TitleForm from './forms/TitleForm';
 import { getPublicAssets } from '../lib/assets';
 import { defaultStyles, fps, defaultImage } from '../lib/config';
 import { bundleProject, saveProjectToDb } from '../lib/project';
+import { asyncPoll } from '../utils/poll';
+import { SpeechProgressResponse } from '../pages/api/speechProgress';
 
 const DEFAULT_TITLE = 'Untitled Project';
 
@@ -97,7 +100,26 @@ export default function EditProject({
         method: 'POST',
         body: encodeFormData({ fileList: audio.file }),
       });
-      const { results }: IRecognizeResponse = await res.json();
+      // const { results }: IRecognizeResponse = await res.json();
+      const { name } = await res.json();
+
+      const checkRecognizeProgress = async () => {
+        const operation: SpeechProgressResponse = await fetch(
+          `/api/speechProgress?operationName=${name}`
+        ).then((r) => r.json());
+        return {
+          done: operation.done || false,
+          data: operation.result as google.cloud.speech.v1.LongRunningRecognizeResponse,
+        };
+      };
+
+      const data = await asyncPoll(
+        checkRecognizeProgress,
+        5 * 1000,
+        300 * 1000
+      );
+
+      const results = data?.results;
 
       if (!results) {
         throw new Error('Speech recognition results are empty');

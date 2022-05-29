@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-// Imports the Google Cloud client library
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import speech from '@google-cloud/speech';
+import speech, { SpeechClient } from '@google-cloud/speech';
 import { IncomingForm } from 'formidable';
-// import type { google } from '@google-cloud/speech/build/protos/protos';
 import { sampleResponse } from '../../utils/sampleResponse2';
-// import { GoogleRecognitionResponse } from '../../types';
+
+export type SpeechResponse = ReturnType<SpeechClient['longRunningRecognize']>;
 
 interface ErrorResponse {
   errorMessage: string;
@@ -21,21 +20,24 @@ const client = new speech.SpeechClient({
   },
 });
 
-async function getSampleResponse() {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-  return sampleResponse;
-}
+// async function getSampleResponse() {
+//   await new Promise((resolve) => setTimeout(resolve, 5000));
+//   return sampleResponse;
+// }
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<GoogleRecognitionResponse | ErrorResponse>
+  res: NextApiResponse<SpeechResponse | ErrorResponse>
 ) {
+  console.time('speech');
   // 1. Save audio file to OS temp folder
   const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'stt-')); // stt: Speech-to-Text
   const form = new IncomingForm({
     uploadDir: tempDir,
     keepExtensions: true,
   });
+
+  console.timeEnd('speech');
 
   return new Promise((resolve, reject) => {
     // 2. Parse form & process audio
@@ -53,7 +55,7 @@ export default async function handler(
 
       const request = {
         config: {
-          encoding: 'MP3',
+          // encoding: 'MP3',
           sampleRateHertz: 16000,
           languageCode: 'en-US',
           enableWordTimeOffsets: true,
@@ -62,10 +64,12 @@ export default async function handler(
       };
 
       try {
-        // const response = await getSampleResponse();
-        const [response] = await client.recognize(request);
-        res.status(200).json(response);
-        resolve(response);
+        console.time('recognize');
+        // const [response] = await client.recognize(request);
+        const [operation] = await client.longRunningRecognize(request);
+        res.status(200).json(operation);
+        console.timeEnd('recognize');
+        resolve(operation);
       } catch (error) {
         res.status(500).json({ errorMessage: 'Internal Server Error' });
         console.error(error);
