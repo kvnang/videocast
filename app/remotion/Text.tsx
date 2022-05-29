@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
 import {
   continueRender,
   delayRender,
@@ -37,18 +37,19 @@ export function Text({
   const { fps } = useVideoConfig();
   const frame = useCurrentFrame();
 
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const [firstFramesOfPage, setFirstFramesOfPage] = useState<FrameProps>({});
+  const textContainerRef = React.useRef<HTMLDivElement>(null);
+  const [firstFramesOfPage, setFirstFramesOfPage] = React.useState<FrameProps>(
+    {}
+  );
 
-  const [handle] = useState(() => delayRender());
+  const [handle] = React.useState(() => delayRender());
 
   const debouncedWords = useDebounce(words, 1000);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const textContainer = textContainerRef.current;
 
     const calculateFirstFrames = () => {
-      console.log('recalc');
       const firstFrames: FrameProps = {};
 
       if (!textContainer) {

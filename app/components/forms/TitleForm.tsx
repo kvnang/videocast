@@ -43,7 +43,7 @@ export default function TitleForm({
             <input
               type="text"
               id="title"
-              className="bg-transparent border-b-2 border-slate-500 pt-2 pb-1 pr-6 text-xl focus:border-indigo-500 transition-colors w-full -mt-0.5"
+              className="bg-transparent border-b-2 border-slate-500 pt-2 pb-1 pr-6 text-xl focus:outline-none focus:border-indigo-500 transition-colors w-full -mt-0.5"
               placeholder="Project Title"
               defaultValue={title || ''}
               aria-invalid={!!errors.title}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Claims, getSession } from '@auth0/nextjs-auth0';
 import type { GetServerSideProps } from 'next';
 import EditProject from '../../../components/EditProject';
-import { getProject } from '../../../lib/project';
+import { getProject } from '../../../lib/getProject';
 import { ProjectDocument } from '../../../types';
 import { absolutizeUrl } from '../../../utils/helpers';
 import SEO from '../../../components/Seo';

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import * as React from 'react';
 import { Player } from '@remotion/player';
 import { Claims } from '@auth0/nextjs-auth0';
 import {
@@ -33,7 +33,7 @@ import SaveTemplate from './SaveTemplate';
 import TitleForm from './forms/TitleForm';
 import { getPublicAssets } from '../lib/assets';
 import { defaultStyles, fps, defaultImage } from '../lib/config';
-import { bundleProject, saveProjectToDb } from '../lib/saveProject';
+import { bundleProject, saveProjectToDb } from '../lib/project';
 
 const DEFAULT_TITLE = 'Untitled Project';
 
@@ -49,34 +49,38 @@ export default function EditProject({
   const defaultProps = project?.inputProps;
   const userID = user.sub;
 
-  const { setModal } = useContext(ModalContext);
+  const { setModal } = React.useContext(ModalContext);
   const router = useRouter();
 
-  const [formKey, setFormKey] = useState(0); // To Force Re-Render
+  const [formKey, setFormKey] = React.useState(0); // To Force Re-Render
 
-  const [title, setTitle] = useState<string | null>(project?.title || null);
-  const [words, setWords] = useState<WordProps | null>(
+  const [title, setTitle] = React.useState<string | null>(
+    project?.title || null
+  );
+  const [words, setWords] = React.useState<WordProps | null>(
     defaultProps?.words || null
   );
-  const [audio, setAudio] = useState<FileProps | null>(
+  const [audio, setAudio] = React.useState<FileProps | null>(
     defaultProps?.audio ? { base64: defaultProps.audio } : null
   );
-  const [audioDuration, setAudioDuration] = useState<number | null>(
+  const [audioDuration, setAudioDuration] = React.useState<number | null>(
     defaultProps?.audioDuration || null
   );
-  const [image, setImage] = useState<FileProps | null>(
+  const [image, setImage] = React.useState<FileProps | null>(
     defaultProps?.image ? { base64: defaultProps.image } : null
   );
-  const [styles, setStyles] = useState<StylesProps>(
+  const [styles, setStyles] = React.useState<StylesProps>(
     defaultProps?.styles || defaultStyles
   );
-  const [loadedStyles, setLoadedStyles] = useState<StylesProps>(
+  const [loadedStyles, setLoadedStyles] = React.useState<StylesProps>(
     defaultProps?.styles || defaultStyles
   );
-  const [transcribeLoading, setTranscribeLoading] = useState<boolean>(false);
+  const [transcribeLoading, setTranscribeLoading] =
+    React.useState<boolean>(false);
 
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isRendering, setIsRendering] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
+  const [isRendering, setIsRendering] = React.useState<boolean>(false);
+  const [isMounted, setIsMounted] = React.useState<boolean>(false);
 
   const isDemo = user.sub.startsWith('demo|');
 
@@ -88,6 +92,7 @@ export default function EditProject({
 
       setTranscribeLoading(true);
 
+      // TODO: Handle timeouts when this takes > 10s
       const res = await fetch('/api/speech', {
         method: 'POST',
         body: encodeFormData({ fileList: audio.file }),
@@ -112,9 +117,11 @@ export default function EditProject({
         throw new Error('Words are empty');
       }
       setWords(allWords);
-      toast.success('Transcription Successful');
+      toast.success('Transcription successful');
     } catch (err) {
       console.error(err);
+      setTranscribeLoading(true);
+      toast.error('Transcription failed. Please try again.');
       throw err;
     } finally {
       setTranscribeLoading(false);
@@ -231,9 +238,7 @@ export default function EditProject({
     await saveProject({ renderData, status: 'processing' });
   }
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
-
-  useEffect(() => {
+  React.useEffect(() => {
     setIsMounted(true);
 
     if (isDemo) {

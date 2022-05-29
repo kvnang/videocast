@@ -1,9 +1,9 @@
-import { CSSProperties, useContext, useRef } from 'react';
+import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import { ModalContext } from './ModalContext';
 
-const contentStyles: CSSProperties = {
+const contentStyles: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   maxHeight: '100%',
@@ -14,7 +14,7 @@ const contentStyles: CSSProperties = {
   pointerEvents: 'none',
 };
 
-const closeStyles: CSSProperties = {
+const closeStyles: React.CSSProperties = {
   position: 'absolute',
   right: '1rem',
   top: '1rem',
@@ -41,14 +41,14 @@ const modalContentVariants = {
 };
 
 export default function Modal() {
-  const { modal, setModal } = useContext(ModalContext);
+  const { modal, setModal } = React.useContext(ModalContext);
   const { id, modalOpen, modalContent, children, wrapperClassName } = modal;
 
   const setModalOpen = (value: boolean) => {
     setModal({ ...modal, modalOpen: value });
   };
 
-  const modalContentRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = React.useRef<HTMLDivElement>(null);
   useOnClickOutside(modalContentRef, () => setModalOpen(false));
 
   return (

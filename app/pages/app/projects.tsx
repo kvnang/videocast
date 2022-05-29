@@ -1,6 +1,6 @@
-import { useUser } from '@auth0/nextjs-auth0';
-import React from 'react';
+import * as React from 'react';
 import toast from 'react-hot-toast';
+import { useUser } from '@auth0/nextjs-auth0';
 import { ProjectTile } from '../../components/ProjectTile';
 import { ProjectDocument } from '../../types';
 

@@ -1,5 +1,4 @@
 import { useAudioData, visualizeAudio } from '@remotion/media-utils';
-import React from 'react';
 import { Audio, useCurrentFrame, interpolate, useVideoConfig } from 'remotion';
 
 function AudioVisualization({

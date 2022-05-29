@@ -1,4 +1,3 @@
-import React from 'react';
 import { Composition, getInputProps } from 'remotion';
 import { compositionId, defaultStyles, fps } from '../lib/config';
 import { PodcastVideo } from './PodcastVideo';

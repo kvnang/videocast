@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import * as React from 'react';
 
 interface ModalProps {
   id?: string;
@@ -25,16 +25,19 @@ const modalDefaults = {
   wrapperClassName: '',
 };
 
-export const ModalContext = createContext<ModalContextProps>({
+export const ModalContext = React.createContext<ModalContextProps>({
   modal: modalDefaults,
   setModal: () => {},
 });
 
 export function ModalProvider({ children }: any) {
-  const [modal, setModal] = useState(modalDefaults);
+  const [modal, setModal] = React.useState(modalDefaults);
 
   return (
-    <ModalContext.Provider value={{ modal, setModal }}>
+    <ModalContext.Provider
+      // eslint-disable-next-line react/jsx-no-constructed-context-values
+      value={{ modal, setModal }}
+    >
       {children}
     </ModalContext.Provider>
   );

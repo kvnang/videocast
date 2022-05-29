@@ -1,7 +1,7 @@
 import * as React from 'react';
 import toast from 'react-hot-toast';
 import { IoVideocamOutline } from 'react-icons/io5';
-import { saveProjectToDb } from '../lib/saveProject';
+import { saveProjectToDb } from '../lib/project';
 import { JobProps, ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
 import { asyncPoll } from '../utils/poll';
@@ -35,7 +35,6 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
     if (!project.renderData) {
       throw new Error('renderData is not ready');
     }
-    console.log('Render Data', project.renderData);
     const { renderId, bucketName, functionName } = project.renderData;
 
     setJob({

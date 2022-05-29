@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import * as React from 'react';
 import { Sequence, Img, AbsoluteFill, useVideoConfig } from 'remotion';
 import { Heading } from './Heading';
 import { Text } from './Text';
@@ -13,7 +13,7 @@ const imgStyles = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
-} as CSSProperties;
+} as React.CSSProperties;
 
 export function PodcastVideo({
   styles,

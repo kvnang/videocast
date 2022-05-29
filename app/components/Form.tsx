@@ -1,6 +1,25 @@
-import React, { useEffect } from 'react';
+import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { WordProps } from '../types';
+
+interface RemoveButtonProps {
+  className?: string;
+  sentenceIndex: number;
+  wordIndex: number;
+  words: WordProps;
+  setWords: (v: WordProps) => void;
+  formKey: number;
+  setFormKey: (v: number) => void;
+}
+interface AddButtonProps extends RemoveButtonProps {
+  position?: 'before' | 'after';
+}
+
+/**
+ * Convert Milliseconds to Nanos, ensuring that 1000 and 1 are equal (i.e. 0.1 second)
+ */
+const convertMsToNanos = (ms: number) =>
+  Math.floor(parseFloat(`0.${ms}`) * 10000 * 100000);
 
 function AddButton({
   className = '',
@@ -11,7 +30,7 @@ function AddButton({
   setWords,
   formKey,
   setFormKey,
-}) {
+}: AddButtonProps) {
   function handleClick() {
     // console.log(words[sentenceIndex]);
     const newIndex = position === 'before' ? wordIndex : wordIndex + 1;
@@ -53,7 +72,7 @@ function RemoveButton({
   setWords,
   formKey,
   setFormKey,
-}) {
+}: RemoveButtonProps) {
   function handleClick() {
     const newWords = [...words];
     newWords[sentenceIndex].splice(wordIndex, 1);
@@ -82,24 +101,27 @@ export default function Form({
     register,
     handleSubmit,
     watch,
+    getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm<{ words: WordProps }>();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = handleSubmit((data) => console.log(data));
 
-  useEffect(() => {
+  React.useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (!name || !words) {
         return;
       }
 
-      const sentenceIndex = name?.split('-')[1]
-        ? parseInt(name?.split('-')[1])
+      console.log('VALUES', value);
+
+      const sentenceIndex = name?.split('.')[1]
+        ? parseInt(name?.split('.')[1])
         : null;
-      const wordIndex = name?.split('-')[2]
-        ? parseInt(name?.split('-')[2])
+      const wordIndex = name?.split('.')[2]
+        ? parseInt(name?.split('.')[2])
         : null;
-      const valueType = name?.split('-')[3] || null;
+      const valueType = name?.split('.')[3] || null;
 
       if (sentenceIndex === null || wordIndex === null) {
         return;
@@ -108,21 +130,25 @@ export default function Form({
       const newWords = [...words];
 
       if (valueType === 'word') {
-        newWords[sentenceIndex][wordIndex].word = value[name];
+        const fieldValue =
+          value.words?.[sentenceIndex]?.[wordIndex]?.[valueType];
+        newWords[sentenceIndex][wordIndex].word = fieldValue;
       } else if (valueType === 'startTime' || valueType === 'endTime') {
-        const timeUnit = name?.split('-')[4] || null;
-        if (!timeUnit || (!value[name] && value[name] !== 0)) {
+        const timeUnit = name?.split('.')[4] as 'seconds' | 'nanos';
+        const fieldValue = (value.words?.[sentenceIndex]?.[wordIndex]?.[
+          valueType
+        ]?.[timeUnit] || 0) as string | number;
+
+        if (!timeUnit || (!fieldValue && fieldValue !== 0)) {
           return;
         }
-        if (timeUnit === 'seconds') {
-          newWords[sentenceIndex][wordIndex][valueType].seconds =
-            value[name].toString();
-        } else if (timeUnit === 'milliseconds') {
-          newWords[sentenceIndex][wordIndex][valueType].nanos = Math.floor(
-            parseFloat(`0.${value[name].toString()}`) * 10000 * 100000
-          );
-        }
+
+        newWords[sentenceIndex][wordIndex][valueType][timeUnit] =
+          timeUnit === 'nanos'
+            ? convertMsToNanos(fieldValue as number)
+            : fieldValue;
       }
+      console.log(newWords);
       setWords(newWords);
     });
     return () => subscription.unsubscribe();
@@ -133,7 +159,7 @@ export default function Form({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={onSubmit}>
       {words.map((sentence, i) => (
         <div
           key={`form-words-group-${i}`}
@@ -158,7 +184,7 @@ export default function Form({
                   type="text"
                   defaultValue={word.word || ''}
                   className="w-full rounded-md bg-slate-800 px-3 py-1 border-2 border-slate-800 focus:outline-none focus:border-indigo-500 transition-colors"
-                  {...register(`word-${i}-${j}-word`)}
+                  {...register(`words.${i}.${j}.word`)}
                 />
                 <RemoveButton
                   className="absolute w-6 h-6 rounded-full top-1/2 -translate-y-1/2 right-1 hover:bg-slate-600 hover:text-red-200 transition-colors transition-opacity opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
@@ -186,8 +212,12 @@ export default function Form({
                     className="rounded-md bg-transparent focus:bg-slate-800 p-1 w-8 text-right"
                     type="number"
                     min="0"
-                    defaultValue={parseInt(word.startTime.seconds)}
-                    {...register(`word-${i}-${j}-startTime-seconds`)}
+                    defaultValue={
+                      typeof word.startTime?.seconds === 'string'
+                        ? parseInt(word.startTime.seconds)
+                        : Number(word.startTime?.seconds || 0)
+                    }
+                    {...register(`words.${i}.${j}.startTime.seconds`)}
                   />
                   .
                   <input
@@ -196,8 +226,15 @@ export default function Form({
                     min="0"
                     max="9999"
                     step="1000"
-                    defaultValue={Math.floor(word.startTime.nanos / 100000)}
-                    {...register(`word-${i}-${j}-startTime-milliseconds`)}
+                    defaultValue={
+                      word.startTime?.nanos
+                        ? Math.floor(word.startTime.nanos / 100000)
+                        : 0
+                    }
+                    {...register(`words.${i}.${j}.startTime.nanos`, {
+                      valueAsNumber: true,
+                      setValueAs: (v) => convertMsToNanos(v), // only happens pre-validation
+                    })}
                   />
                 </div>
                 <span className="px-1">–</span>
@@ -206,8 +243,12 @@ export default function Form({
                     className="rounded-md bg-transparent focus:bg-slate-800 p-1 w-8 text-right"
                     type="number"
                     min="0"
-                    defaultValue={parseInt(word.endTime.seconds)}
-                    {...register(`word-${i}-${j}-endTime-seconds`)}
+                    defaultValue={
+                      typeof word.endTime?.seconds === 'string'
+                        ? parseInt(word.endTime.seconds)
+                        : Number(word.endTime?.seconds || 0)
+                    }
+                    {...register(`words.${i}.${j}.endTime.seconds`)}
                   />
                   .
                   <input
@@ -216,8 +257,15 @@ export default function Form({
                     min="0"
                     max="9999"
                     step="1000"
-                    defaultValue={Math.floor(word.endTime.nanos / 100000)}
-                    {...register(`word-${i}-${j}-endTime-milliseconds`)}
+                    defaultValue={
+                      word.endTime?.nanos
+                        ? Math.floor(word.endTime.nanos / 100000)
+                        : 0
+                    }
+                    {...register(`words.${i}.${j}.endTime.nanos`, {
+                      valueAsNumber: true,
+                      setValueAs: (v) => v * 100000, // only happens pre-validation
+                    })}
                   />
                 </div>
               </div>

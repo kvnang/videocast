@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { getAudioData, getAudioDurationInSeconds } from '@remotion/media-utils';
+import { getAudioData } from '@remotion/media-utils';
 import { FileProps } from '../../types';
 import { fileToBase64 } from '../../utils/helpers';
 
@@ -26,13 +26,13 @@ export default function AudioForm({
     // handleSubmit,
   } = useForm();
 
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileName, setFileName] = React.useState<string | null>(null);
 
   async function processAudio(src: string, setState?: boolean) {
     const audioData = await getAudioData(src);
-    const _audioDuration = audioData.durationInSeconds;
+    const { numberOfChannels, durationInSeconds } = audioData;
 
-    if (_audioDuration > 60) {
+    if (durationInSeconds > 60) {
       setError('audio', {
         type: 'lessThan1Minute',
         message: 'Audio length must be 1 minute or less',
@@ -40,14 +40,14 @@ export default function AudioForm({
       return false;
     }
 
-    // if (setState) {
-    setAudioDuration(_audioDuration);
-    // }
+    console.log(numberOfChannels);
 
-    return _audioDuration;
+    setAudioDuration(durationInSeconds);
+
+    return durationInSeconds;
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     const subscription = watch(async (value) => {
       if (value?.audio?.length && value.audio[0] instanceof File) {
         const base64 = await fileToBase64(value.audio[0]);
@@ -69,7 +69,7 @@ export default function AudioForm({
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Whenever audio is updated, validate audio
     if (audio?.base64) {
       processAudio(audio.base64 as string);
@@ -100,6 +100,7 @@ export default function AudioForm({
               type="file"
               className="block w-full text-sm text-gray-200 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-700 file:text-indigo-50 hover:file:bg-indigo-600 file:cursor-pointer transition-colors"
               aria-invalid={!!errors.audio}
+              accept="audio/mpeg"
               {...register('audio', {
                 validate: {
                   lessThan2MB: (files) => files[0]?.size < 2000000 || 'Max 2MB',

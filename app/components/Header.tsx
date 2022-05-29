@@ -1,4 +1,3 @@
-import React from 'react';
 import { IoLogOutOutline, IoLogInOutline } from 'react-icons/io5';
 import Image from 'next/image';
 import { useUser } from '@auth0/nextjs-auth0';

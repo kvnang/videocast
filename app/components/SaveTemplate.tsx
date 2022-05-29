@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { TemplateDocument } from '../pages/api/templates';
@@ -21,7 +21,7 @@ export default function SaveTemplate({
     setError,
   } = useForm<{ templateName: string }>();
 
-  const { setModal } = useContext(ModalContext);
+  const { setModal } = React.useContext(ModalContext);
 
   const onSubmit = handleSubmit(async (data) => {
     // Check if name is duplicate

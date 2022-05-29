@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import * as React from 'react';
 import { IoMdTrash } from 'react-icons/io';
 import toast from 'react-hot-toast';
 import { TemplateDocument } from '../pages/api/templates';
@@ -11,8 +11,10 @@ export default function CurrentTemplates({
   userID: string | null | undefined;
   setLoadedStyles: Function;
 }) {
-  const { setModal } = useContext(ModalContext);
-  const [templates, setTemplates] = useState<TemplateDocument[] | null>(null);
+  const { setModal } = React.useContext(ModalContext);
+  const [templates, setTemplates] = React.useState<TemplateDocument[] | null>(
+    null
+  );
 
   async function fetchTemplates() {
     const res = await fetch(`/api/templates?userID=${userID}`, {
@@ -22,7 +24,7 @@ export default function CurrentTemplates({
     setTemplates(json);
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchTemplates();
   }, []);
 
