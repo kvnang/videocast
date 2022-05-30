@@ -1,5 +1,7 @@
 import type { AwsRegion } from '@remotion/lambda';
 
+export const CF_WORKER_URL = 'https://videocast.kvnang.workers.dev';
+
 export const defaultStyles = {
   textColor: '#FFFFFF',
   accentColor: '#EFC88B',

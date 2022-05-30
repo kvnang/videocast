@@ -1,5 +1,7 @@
+import { CF_WORKER_URL } from './config';
+
 export async function uploadFileToR2(body: ArrayBuffer, fileName?: string) {
-  if (!process.env.CF_WORKER_URL) {
+  if (!CF_WORKER_URL) {
     throw new Error('Cloudflare Worker URL is not defined');
   }
 
@@ -8,7 +10,7 @@ export async function uploadFileToR2(body: ArrayBuffer, fileName?: string) {
   }
 
   const uploadResponse = await fetch(
-    `${process.env.CF_WORKER_URL}/storage/${fileName || Date.now()}`,
+    `${CF_WORKER_URL}/storage/${fileName || Date.now()}`,
     {
       method: 'PUT',
       headers: {
@@ -20,14 +22,14 @@ export async function uploadFileToR2(body: ArrayBuffer, fileName?: string) {
   );
 
   if (uploadResponse.ok) {
-    return `${process.env.CF_WORKER_URL}/storage/${fileName}`;
+    return `${CF_WORKER_URL}/storage/${fileName}`;
   }
 
   throw new Error('Uncaught error');
 }
 
 export async function getRenderData() {
-  const res = await fetch(`${process.env.CF_WORKER_URL}/render/renderData`, {
+  const res = await fetch(`${CF_WORKER_URL}/render/renderData`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -42,13 +44,13 @@ export async function getRenderData() {
 }
 
 export function convertS3toR2(url: string) {
-  if (!process.env.CF_WORKER_URL) {
+  if (!CF_WORKER_URL) {
     console.error('Cloudflare Worker URL is not defined');
     return url;
   }
 
   return url.replace(
     'https://s3.us-east-1.amazonaws.com',
-    `${process.env.CF_WORKER_URL}/storage`
+    `${CF_WORKER_URL}/storage`
   );
 }

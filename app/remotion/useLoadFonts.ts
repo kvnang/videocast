@@ -1,10 +1,14 @@
 import { continueRender, delayRender } from 'remotion';
+import { CF_WORKER_URL } from '../lib/config';
 import { absolutizeUrl } from '../utils/helpers';
 
 export async function useLoadFonts(fontFamily: string) {
   const waitForFont = delayRender();
   const endpoint = `/api/fonts/${fontFamily}`;
-  const fontData = await fetch(absolutizeUrl(endpoint)).then((r) => r.json());
+  const fontData = await fetch(`${CF_WORKER_URL}/fonts/${fontFamily}`).then(
+    (r) => r.json()
+  );
+  console.log(absolutizeUrl(endpoint));
 
   if (!fontData) {
     console.error('Font data not found');

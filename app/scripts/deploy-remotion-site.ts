@@ -11,6 +11,7 @@ import {
 import path from 'node:path';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+import { CF_WORKER_URL } from '../lib/config';
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ async function saveRenderData({
 }) {
   console.log('Saving bucketName, serveUrl, functionName to KV');
 
-  if (!process.env.CF_WORKER_URL) {
+  if (!CF_WORKER_URL) {
     throw new Error('Cloudflare Worker URL is not defined');
   }
 
@@ -36,7 +37,7 @@ async function saveRenderData({
   }
 
   try {
-    await fetch(`${process.env.CF_WORKER_URL}/render/renderData`, {
+    await fetch(`${CF_WORKER_URL}/render/renderData`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

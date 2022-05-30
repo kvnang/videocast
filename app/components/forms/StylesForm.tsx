@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { defaultFonts, defaultStyles } from '../../lib/config';
+import { CF_WORKER_URL, defaultFonts, defaultStyles } from '../../lib/config';
 import { FontProps, StylesProps } from '../../types';
 import { InputField } from './FormFields';
 
@@ -14,7 +14,9 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
   const [fonts, setFonts] = React.useState<FontProps[]>([]);
 
   async function getFonts() {
-    const allFonts = await fetch(`/api/fonts`).then((r) => r.json());
+    const allFonts = await fetch(`${CF_WORKER_URL}/fonts/`).then((r) =>
+      r.json()
+    );
     setFonts(allFonts);
   }
 
