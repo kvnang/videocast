@@ -21,6 +21,7 @@ export interface InputProps {
   audio: string;
   image: string;
   audioDuration: number;
+  fontData: FontProps;
 }
 
 export type ProjectStatus = 'processing' | 'done' | 'error';

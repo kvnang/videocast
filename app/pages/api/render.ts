@@ -21,7 +21,8 @@ export default async function handler(
 
   const { body } = req;
 
-  const { styles, words, audio, audioDuration, image, outName } = body;
+  const { styles, words, audio, audioDuration, image, outName, fontData } =
+    body;
 
   const { serveUrl, bucketName, functionName } = await getRenderData();
 
@@ -31,6 +32,7 @@ export default async function handler(
     audioDuration,
     image,
     words,
+    fontData,
   };
 
   // console.time('renderMediaOnLambda');

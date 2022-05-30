@@ -14,10 +14,15 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
   const [fonts, setFonts] = React.useState<FontProps[]>([]);
 
   async function getFonts() {
-    const allFonts = await fetch(`${CF_WORKER_URL}/fonts/`).then((r) =>
-      r.json()
-    );
-    setFonts(allFonts);
+    try {
+      const allFonts = await fetch(`${CF_WORKER_URL}/fonts/`).then((r) =>
+        r.json()
+      );
+      setFonts(allFonts);
+    } catch (err) {
+      console.error(err);
+      setFonts(defaultFonts);
+    }
   }
 
   const {
@@ -68,6 +73,10 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
       }
     });
   }, [loadedStyles]);
+
+  if (!fonts?.length) {
+    return null;
+  }
 
   return (
     <ul className="flex flex-wrap -m-2">
@@ -149,7 +158,7 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
               className="bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:outline-none focus:border-indigo-500 transition-colors"
               {...register('fontFamily', { required: true })}
             >
-              {(fonts || defaultFonts).map((font) => (
+              {fonts.map((font) => (
                 <option key={font.family} value={font.family}>
                   {font.family}
                 </option>

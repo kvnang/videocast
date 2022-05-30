@@ -54,3 +54,11 @@ export function convertS3toR2(url: string) {
     `${CF_WORKER_URL}/storage`
   );
 }
+
+export async function getFontData(fontFamily: string) {
+  const fontData = await fetch(`${CF_WORKER_URL}/fonts/${fontFamily}`).then(
+    (r) => r.json()
+  );
+
+  return fontData;
+}

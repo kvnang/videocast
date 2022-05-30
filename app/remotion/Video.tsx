@@ -15,6 +15,7 @@ export function RemotionVideo() {
       height={720}
       defaultProps={{
         styles: defaultStyles,
+        fontData: inputProps.fontData,
       }}
     />
   );

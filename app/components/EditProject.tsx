@@ -37,6 +37,7 @@ import { defaultStyles, fps, defaultImage } from '../lib/config';
 import { bundleProject, saveProjectToDb } from '../lib/project';
 import { asyncPoll } from '../utils/poll';
 import { SpeechProgressResponse } from '../pages/api/speechProgress';
+import { getFontData } from '../lib/cloudflare';
 
 const DEFAULT_TITLE = 'Untitled Project';
 
@@ -175,6 +176,7 @@ export default function EditProject({
       audio: publicAudio,
       audioDuration,
       image: publicImage || defaultImage,
+      fontData: await getFontData(styles.fontFamily),
     };
 
     return inputProps;

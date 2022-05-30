@@ -1,34 +1,58 @@
+import * as React from 'react';
 import { continueRender, delayRender } from 'remotion';
 import { CF_WORKER_URL } from '../lib/config';
-import { absolutizeUrl } from '../utils/helpers';
+import { FontProps } from '../types';
 
-export async function useLoadFonts(fontFamily: string) {
-  const waitForFont = delayRender();
-  const endpoint = `/api/fonts/${fontFamily}`;
+const cache = new Map<string, FontProps>();
+
+async function getFontData(fontFamily: string) {
+  if (cache.has(fontFamily)) {
+    return cache.get(fontFamily);
+  }
+
   const fontData = await fetch(`${CF_WORKER_URL}/fonts/${fontFamily}`).then(
     (r) => r.json()
   );
-  console.log(absolutizeUrl(endpoint));
 
-  if (!fontData) {
-    console.error('Font data not found');
-    return;
-  }
+  cache.set(fontFamily, fontData);
 
-  const font = new FontFace(
-    fontData.family,
-    `url(${fontData.files['700'] || fontData.files.regular}) format('woff2')`
-  );
-  font
-    .load()
-    .then(() => {
-      document.fonts.add(font);
-    })
-    .catch((err) => {
-      console.log('Error loading font', err);
-    });
+  return fontData;
+}
 
-  continueRender(waitForFont);
+export async function useLoadFonts(fontFamily: string, fontData?: FontProps) {
+  const [handle] = React.useState(() => delayRender());
 
-  return fontFamily;
+  const loadFont = async () => {
+    let data = fontData;
+
+    // If fontData isn't passed, load it from the cloudflare worker.
+    // This should only happen when using the client-side Video player.
+    if (!fontData) {
+      data = await getFontData(fontFamily);
+    }
+
+    if (!data) {
+      return;
+    }
+
+    const font = new FontFace(
+      data.family,
+      `url(${data.files['700'] || data.files.regular}) format('woff2')`
+    );
+
+    font
+      .load()
+      .then(() => {
+        document.fonts.add(font);
+      })
+      .catch((err) => {
+        console.log('Error loading font', err);
+      });
+
+    continueRender(handle);
+  };
+
+  React.useEffect(() => {
+    loadFont();
+  }, [handle, fontFamily]);
 }
