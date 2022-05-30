@@ -1,10 +1,10 @@
 import { continueRender, delayRender } from 'remotion';
+import { absolutizeUrl } from '../utils/helpers';
 
 export async function useLoadFonts(fontFamily: string) {
   const waitForFont = delayRender();
-  const fontData = await fetch(`/api/fonts/${fontFamily}`).then((r) =>
-    r.json()
-  );
+  const endpoint = `/api/fonts/${fontFamily}`;
+  const fontData = await fetch(absolutizeUrl(endpoint)).then((r) => r.json());
   console.log(fontData);
 
   if (!fontData) {
