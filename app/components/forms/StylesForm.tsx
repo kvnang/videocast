@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { defaultStyles } from '../../lib/config';
-import { StylesProps } from '../../types';
+import { defaultFonts, defaultStyles } from '../../lib/config';
+import { FontProps, StylesProps } from '../../types';
 import { InputField } from './FormFields';
 
 interface Props {
@@ -11,6 +11,13 @@ interface Props {
 }
 
 export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
+  const [fonts, setFonts] = React.useState<FontProps[]>([]);
+
+  async function getFonts() {
+    const allFonts = await fetch(`/api/fonts`).then((r) => r.json());
+    setFonts(allFonts);
+  }
+
   const {
     register,
     watch,
@@ -21,6 +28,12 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
   } = useForm({
     defaultValues: { ...defaultStyles },
   });
+
+  useEffect(() => {
+    if (!fonts?.length) {
+      getFonts();
+    }
+  }, []);
 
   useEffect(() => {
     const subscription = watch(async (value, { name, type }) => {
@@ -134,9 +147,11 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
               className="bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:outline-none focus:border-indigo-500 transition-colors"
               {...register('fontFamily', { required: true })}
             >
-              <option value="Poppins">Poppins</option>
-              <option value="Source Sans Pro">Source Sans Pro</option>
-              <option value="Open Sans">Open Sans</option>
+              {(fonts || defaultFonts).map((font) => (
+                <option key={font.family} value={font.family}>
+                  {font.family}
+                </option>
+              ))}
             </select>
           </div>
         </label>

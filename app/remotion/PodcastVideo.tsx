@@ -5,6 +5,7 @@ import { Text } from './Text';
 import { TextAudio } from './TextAudio';
 import { flatten } from '../utils/helpers';
 import { StylesProps, WordProps } from '../types';
+import { useLoadFonts } from './useLoadFonts';
 
 const imgStyles = {
   position: 'absolute',
@@ -29,6 +30,8 @@ export function PodcastVideo({
   image?: string;
 }) {
   const { fps } = useVideoConfig();
+
+  useLoadFonts(styles.fontFamily);
 
   if (!words?.length || !audio || !audioDuration) {
     return null;

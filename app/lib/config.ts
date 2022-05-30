@@ -3,12 +3,14 @@ import type { AwsRegion } from '@remotion/lambda';
 export const defaultStyles = {
   textColor: '#FFFFFF',
   accentColor: '#EFC88B',
-  fontFamily: 'Poppins',
+  fontFamily: 'Cabin',
   fontSize: 60,
   lineHeight: 1.25,
   title: '',
   subtitle: '',
 };
+
+export const defaultFonts = [{ family: 'Cabin', files: {} }];
 
 export const compositionId = 'PodcastVideo';
 

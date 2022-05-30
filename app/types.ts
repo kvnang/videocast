@@ -113,3 +113,8 @@ export interface JobProps {
     [key: string]: string | number | undefined | null;
   };
 }
+
+export interface FontProps {
+  family: string;
+  files: Record<string, string>;
+}

@@ -1,17 +1,17 @@
 import { AwsClient } from 'aws4fetch';
-
-interface Env {
-  MY_BUCKET: R2Bucket;
-  CF_AUTH_SECRET: string;
-  RENDER_KV: KVNamespace;
-  AWS_ACCESS_KEY_ID: string;
-  AWS_SECRET_ACCESS_KEY: string;
-}
+import { getFonts } from './fonts';
+import { Env, FontProps } from './types';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
   'Access-Control-Allow-Headers': '*',
+};
+
+const patterns = {
+  storage: /^\/storage\/(.*)\/?$/i,
+  render: /^\/render\/(.*)\/?$/i,
+  fonts: /^\/fonts\/(.*)\/?$/i,
 };
 
 const hasValidHeader = (request: Request, env: Env) =>
@@ -23,15 +23,10 @@ function authorizeRequest(request: Request, env: Env) {
     case 'DELETE':
       return hasValidHeader(request, env);
     case 'GET':
-      // return ALLOW_LIST.includes(key);
       return true;
     default:
       return false;
   }
-}
-
-function unLeadingSlashIt(url: string) {
-  return url.replace(/^\/+/, '');
 }
 
 async function handleStorage(
@@ -40,13 +35,15 @@ async function handleStorage(
   ctx: EventContext<any, any, any>
 ) {
   const url = new URL(request.url);
-  const pathnames = unLeadingSlashIt(url.pathname).split('/');
-  pathnames.shift();
-  const objectName = pathnames.join('/');
+  const key = patterns.storage.exec(url.pathname)?.[1];
+
+  if (!key) {
+    return new Response('Object not specified in the request', { status: 404 });
+  }
 
   switch (request.method) {
     case 'PUT': {
-      const object = await env.MY_BUCKET.put(objectName, request.body, {
+      const object = await env.R2.put(key, request.body, {
         httpMetadata: request.headers,
       });
       return new Response(null, {
@@ -56,7 +53,7 @@ async function handleStorage(
       });
     }
     case 'GET': {
-      const object = await env.MY_BUCKET.get(objectName);
+      const object = await env.R2.get(key);
 
       if (!object) {
         // 1. Try fetching from S3
@@ -70,8 +67,7 @@ async function handleStorage(
         });
 
         const s3hostname = `https://s3.us-east-1.amazonaws.com`;
-
-        const signedRequest = await aws.sign(`${s3hostname}/${objectName}`);
+        const signedRequest = await aws.sign(`${s3hostname}/${key}`);
         const s3Object = await fetch(signedRequest);
 
         if (!s3Object || s3Object.status === 404) {
@@ -85,7 +81,7 @@ async function handleStorage(
         }
 
         ctx.waitUntil(
-          env.MY_BUCKET.put(objectName, s3Body[0], {
+          env.R2.put(key, s3Body[0], {
             httpMetadata: s3Object.headers,
           })
         );
@@ -95,7 +91,7 @@ async function handleStorage(
       return new Response(object.body, { headers: corsHeaders });
     }
     case 'DELETE':
-      await env.MY_BUCKET.delete(objectName);
+      await env.R2.delete(key);
       return new Response('Deleted!', { status: 200 });
 
     default:
@@ -105,9 +101,11 @@ async function handleStorage(
 
 async function handleRender(request: Request, env: Env) {
   const url = new URL(request.url);
-  const pathnames = unLeadingSlashIt(url.pathname).split('/');
-  pathnames.shift();
-  const key = pathnames.join('/');
+  const key = patterns.render.exec(url.pathname)?.[1];
+
+  if (!key) {
+    return new Response('Key not specified in the request', { status: 404 });
+  }
 
   switch (request.method) {
     case 'PUT': {
@@ -119,12 +117,12 @@ async function handleRender(request: Request, env: Env) {
 
       const { value, options } = await request.json();
 
-      await env.RENDER_KV.put(key, value, options);
+      await env.KV.put(key, value, options);
 
       return new Response(`${key} created!`, { status: 200 });
     }
     case 'GET': {
-      const value = await env.RENDER_KV.get(key);
+      const value = await env.KV.get(key);
 
       if (!value) {
         return new Response('Value Not Found', { status: 404 });
@@ -133,8 +131,58 @@ async function handleRender(request: Request, env: Env) {
       return new Response(value, { headers: corsHeaders });
     }
     case 'DELETE':
-      await env.RENDER_KV.delete(key);
+      await env.KV.delete(key);
       return new Response('Deleted!', { status: 200 });
+
+    default:
+      return new Response('Method Not Allowed', { status: 405 });
+  }
+}
+
+async function handleFonts(request: Request, env: Env) {
+  const url = new URL(request.url);
+  const key = patterns.fonts.exec(url.pathname)?.[1];
+
+  switch (request.method) {
+    case 'GET': {
+      const existingValue = await env.KV.get('fonts');
+
+      if (!existingValue) {
+        const newValue = await getFonts(env);
+        await env.KV.put('fonts', JSON.stringify(newValue), {
+          expirationTtl: 60 * 60 * 24 * 7, // expires in one week
+        });
+      }
+
+      const fonts = await env.KV.get<FontProps[] | undefined>('fonts', 'json');
+
+      if (!fonts?.length) {
+        return new Response('Fonts Not Found', { status: 404 });
+      }
+
+      if (key) {
+        // Get a specific font data
+        const font = fonts?.find((f) => f.family === decodeURIComponent(key));
+
+        if (!font) {
+          return new Response('Font Not Found', { status: 404 });
+        }
+
+        return new Response(JSON.stringify(font), {
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      return new Response(JSON.stringify(fonts), {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
 
     default:
       return new Response('Method Not Allowed', { status: 405 });
@@ -148,16 +196,22 @@ export default {
     }
 
     const url = new URL(request.url);
-    const pathnames = unLeadingSlashIt(url.pathname).split('/');
 
-    if (pathnames[0] === 'storage') {
+    // handle /storage/:key path
+    if (patterns.storage.test(url.pathname)) {
       return handleStorage(request, env, ctx);
     }
 
-    if (pathnames[0] === 'render') {
+    // handle /render/:key path
+    if (patterns.render.test(url.pathname)) {
       return handleRender(request, env);
     }
 
-    return new Response(`Pathname invalid: ${pathnames[0]}`, { status: 404 });
+    // handle /fonts/:key path
+    if (patterns.fonts.test(url.pathname)) {
+      return handleFonts(request, env);
+    }
+
+    return new Response(`Pathname invalid: ${url.pathname}`, { status: 404 });
   },
 };
