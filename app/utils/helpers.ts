@@ -44,10 +44,10 @@ export function formatDate(date: string, ignoreSameYear?: boolean) {
 }
 
 export function getWordTimeInSeconds(time: { seconds: string; nanos: number }) {
-  const { seconds, nanos } = time;
-  return typeof seconds !== 'undefined' && typeof nanos !== 'undefined'
-    ? parseFloat(`${seconds}.${nanos.toString()}`)
-    : 0;
+  const seconds = time.seconds || '0';
+  const nanos = time.nanos || 0;
+
+  return parseFloat(`${seconds}.${nanos.toString()}`);
 }
 
 export async function fileToBase64(file: Blob) {

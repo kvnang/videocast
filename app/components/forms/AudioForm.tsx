@@ -40,7 +40,7 @@ export default function AudioForm({
       return false;
     }
 
-    console.log(numberOfChannels);
+    console.log(`Channels: ${numberOfChannels}`);
 
     setAudioDuration(durationInSeconds);
 

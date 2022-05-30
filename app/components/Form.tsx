@@ -113,8 +113,6 @@ export default function Form({
         return;
       }
 
-      console.log('VALUES', value);
-
       const sentenceIndex = name?.split('.')[1]
         ? parseInt(name?.split('.')[1])
         : null;
@@ -138,8 +136,10 @@ export default function Form({
         const fieldValue = (value.words?.[sentenceIndex]?.[wordIndex]?.[
           valueType
         ]?.[timeUnit] || 0) as string | number;
-
-        if (!timeUnit || (!fieldValue && fieldValue !== 0)) {
+        if (
+          !timeUnit ||
+          (!fieldValue && fieldValue !== 0 && fieldValue !== '0')
+        ) {
           return;
         }
 
@@ -148,7 +148,7 @@ export default function Form({
             ? convertMsToNanos(fieldValue as number)
             : fieldValue;
       }
-      console.log(newWords);
+
       setWords(newWords);
     });
     return () => subscription.unsubscribe();
