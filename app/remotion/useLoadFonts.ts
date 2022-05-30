@@ -5,7 +5,6 @@ export async function useLoadFonts(fontFamily: string) {
   const waitForFont = delayRender();
   const endpoint = `/api/fonts/${fontFamily}`;
   const fontData = await fetch(absolutizeUrl(endpoint)).then((r) => r.json());
-  console.log(fontData);
 
   if (!fontData) {
     console.error('Font data not found');

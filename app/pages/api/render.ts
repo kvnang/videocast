@@ -47,6 +47,9 @@ export default async function handler(
     privacy: 'public',
     quality: 100,
     outName,
+    envVariables: {
+      NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL || '',
+    },
   });
   // console.timeEnd('renderMediaOnLambda');
 
