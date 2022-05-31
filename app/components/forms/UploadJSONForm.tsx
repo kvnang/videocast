@@ -1,44 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { useForm } from 'react-hook-form';
-// import { FileProps } from '../../types';
-// import { fileToBase64 } from '../../utils/helpers';
+import { WordProps } from '../../types';
 
-interface Props {
-  setWords: Function;
+function validateJSON(value: any) {
+  const firstWord = value?.[0]?.[0];
+  if (!firstWord) {
+    console.error('JSON is invalid');
+    return false;
+  }
+
+  const hasWord = typeof firstWord.word === 'string';
+
+  if (!hasWord) {
+    console.error('JSON seems malformatted');
+    return false;
+  }
+
+  return true;
 }
 
-// const UploadJSONStyles = styled.div`
-//   display: inline-flex;
-//   position: relative;
-
-//   input[type='file'] {
-//     clip: rect(0 0 0 0);
-//     clip-path: inset(50%);
-//     height: 1px;
-//     overflow: hidden;
-//     position: absolute;
-//     white-space: nowrap;
-//     width: 1px;
-//   }
-
-//   .clear {
-//   }
-// `;
-
-export default function UploadJSONForm({ setWords }: Props) {
+export default function UploadJSONForm({
+  words,
+  setWords,
+}: {
+  words: WordProps;
+  setWords: (v: WordProps | null) => void;
+}) {
   const {
     register,
     watch,
     formState: { errors },
     setValue,
-    trigger,
-    // handleSubmit,
   } = useForm();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [fileName, setFileName] = useState<string>('');
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [fileName, setFileName] = React.useState<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const subscription = watch(async (value, { name, type }) => {
       if (value?.json?.length && value.json[0] instanceof File) {
         setLoading(true);
@@ -50,7 +48,7 @@ export default function UploadJSONForm({ setWords }: Props) {
             event.target?.result && typeof event.target.result === 'string'
               ? JSON.parse(event.target.result)
               : {};
-          // TODO: Validate JSON
+
           setFileName(value.json[0].name);
           setWords(jsonObj);
         };
@@ -64,10 +62,13 @@ export default function UploadJSONForm({ setWords }: Props) {
   }, [watch, setWords]);
 
   return (
-    <div className="inline-block font-bold">
+    <div className="inline-block">
+      {!fileName && (
+        <span className="text-slate-300">Have the transcription JSON? </span>
+      )}
       <label
         htmlFor="upload-json"
-        className="cursor-pointer hover:text-indigo-200 transition-colors"
+        className="cursor-pointer font-bold transition-all hover:text-shadow"
       >
         <input
           className="sr-only"
@@ -76,24 +77,28 @@ export default function UploadJSONForm({ setWords }: Props) {
           accept="application/json"
           {...register('json', {
             validate: {
-              lessThan2MB: (files) => files[0]?.size < 2000000 || 'Max 2MB',
+              lessThan2MB: (files) => files?.[0]?.size < 2000000 || 'Max 2MB',
               acceptedFormats: (files) =>
                 ['application/json'].includes(files[0]?.type) ||
                 'Only JSON file',
             },
           })}
         />
-        {fileName || 'Upload JSON'}
+        {fileName || 'Import JSON'}
       </label>
-      {/* <button
-        type="button"
-        className="clear"
-        onClick={() => {
-          setValue('json', null, { shouldValidate: true });
-        }}
-      >
-        &times;
-      </button> */}
+      {fileName && (
+        <button
+          type="button"
+          className="h-6 w-6 text-xl leading-none hover:text-indigo-500 transition-colors"
+          onClick={() => {
+            setValue('json', null, { shouldValidate: true });
+            setFileName(null);
+            setWords(null);
+          }}
+        >
+          &times;
+        </button>
+      )}
     </div>
   );
 }

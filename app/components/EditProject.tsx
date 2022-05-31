@@ -319,22 +319,23 @@ export default function EditProject({
       </section>
 
       <section className="container mx-auto text-center mb-16">
-        <Button
-          type="button"
-          className="button"
-          onClick={() => {
-            fetchTranscription();
-          }}
-          disabled={
-            !(audio && audioDuration) || transcribeLoading || words?.length
-          }
-          loading={transcribeLoading}
-          loadingText="Transcribing ..."
-        >
-          Transcribe Audio
-        </Button>
-        &nbsp;&nbsp;or&nbsp;&nbsp;
-        <UploadJSONForm setWords={setWords} />
+        <div className="flex flex-col gap-4 items-center">
+          <Button
+            type="button"
+            className="button"
+            onClick={() => {
+              fetchTranscription();
+            }}
+            disabled={
+              !(audio && audioDuration) || transcribeLoading || words?.length
+            }
+            loading={transcribeLoading}
+            loadingText="Transcribing ..."
+          >
+            Transcribe Audio
+          </Button>
+          <UploadJSONForm setWords={setWords} />
+        </div>
       </section>
 
       {!!words?.length && audio?.base64 && audioDuration && (

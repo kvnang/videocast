@@ -99,7 +99,12 @@ export default function Header() {
               <nav className="ml-4">
                 <ul className="flex gap-4">
                   {menuItems.map((item) => {
-                    const isCurrent = asPath === item.href;
+                    const url =
+                      typeof item.href === 'string'
+                        ? item.href
+                        : item.href.pathname.split('/[')[0];
+                    const isCurrent = asPath === url || asPath.startsWith(url);
+
                     return (
                       <li key={item.title}>
                         <Link href={item.href}>
@@ -121,7 +126,7 @@ export default function Header() {
             {(user && (
               <>
                 {(user.picture && (
-                  <div className="rounded-full overflow-hidden w-8 h-8">
+                  <div className="rounded-full overflow-hidden w-8 h-8 ring-2 ring-indigo-500 ">
                     <Image
                       src={user.picture}
                       alt={user.name || ''}
@@ -129,8 +134,12 @@ export default function Header() {
                       width="32"
                     />
                   </div>
-                )) || <span className="user-name">{user.name}</span>}
-                <a href="/api/auth/logout">
+                )) || <span>{user.name}</span>}
+                <a
+                  href="/api/auth/logout"
+                  className="inline-flex transition-all hover:text-shadow"
+                >
+                  <span className="mr-1">Logout</span>
                   <IoLogOutOutline
                     title="Log out"
                     className="w-6 h-6 text-white"
@@ -138,7 +147,11 @@ export default function Header() {
                 </a>
               </>
             )) || (
-              <a href="/api/auth/login">
+              <a
+                href="/api/auth/login"
+                className="inline-flex transition-all hover:text-shadow"
+              >
+                <span className="mr-1">Login</span>
                 <IoLogInOutline title="Log in" className="w-6 h-6 text-white" />
               </a>
             )}

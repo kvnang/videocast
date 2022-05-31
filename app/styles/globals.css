@@ -63,7 +63,9 @@
 
 html,
 body {
-  @apply overflow-x-hidden bg-slate-900 text-slate-50;
+  @apply overflow-x-hidden;
+
+  /* background-color: linear-gradient(to bottom right,#536976,#292E49); */
 }
 
 html {
@@ -71,10 +73,12 @@ html {
 }
 
 body {
-  @apply text-base;
+  @apply text-base text-slate-50;
   print-color-adjust: economy;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-gradient-to-br from-slate-900 to-slate-800;
+  min-height: 100vh;
 }
 
 .logo line {
