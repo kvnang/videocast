@@ -163,7 +163,7 @@ export default function Form({
       {words.map((sentence, i) => (
         <div
           key={`form-words-group-${i}`}
-          className="flex flex-wrap gap-4 mb-4 last:mb-0"
+          className="flex flex-wrap gap-4 mb-16 last:mb-0"
         >
           {sentence.map((word, j) => (
             <div key={`form-words-group-${i}-${j}`} className="flex-1 group">

@@ -1,6 +1,7 @@
 export interface FileProps {
   file?: FileList | null;
   base64?: string | null;
+  sampleRate?: number | null;
 }
 
 export interface StylesProps {

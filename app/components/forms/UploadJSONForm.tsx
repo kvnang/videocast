@@ -23,7 +23,7 @@ export default function UploadJSONForm({
   words,
   setWords,
 }: {
-  words: WordProps;
+  words: WordProps | null;
   setWords: (v: WordProps | null) => void;
 }) {
   const {

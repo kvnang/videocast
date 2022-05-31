@@ -95,11 +95,14 @@ export default function EditProject({
       }
 
       setTranscribeLoading(true);
+      const startTime = performance.now();
 
-      // TODO: Handle timeouts when this takes > 10s
       const res = await fetch('/api/speech', {
         method: 'POST',
-        body: encodeFormData({ fileList: audio.file }),
+        body: encodeFormData({
+          fileList: audio.file,
+          sampleRate: audio.sampleRate,
+        }),
       });
       // const { results }: IRecognizeResponse = await res.json();
       const { name } = await res.json();
@@ -116,7 +119,7 @@ export default function EditProject({
 
       const data = await asyncPoll(
         checkRecognizeProgress,
-        5 * 1000,
+        1 * 1000,
         300 * 1000
       );
 
@@ -140,7 +143,12 @@ export default function EditProject({
         throw new Error('Words are empty');
       }
       setWords(allWords);
-      toast.success('Transcription successful');
+      const endTime = performance.now();
+      toast.success(
+        `Transcription successful! It took ${Math.ceil(
+          (endTime - startTime) / 1000
+        )} seconds ...`
+      );
     } catch (err) {
       console.error(err);
       setTranscribeLoading(true);
@@ -334,7 +342,7 @@ export default function EditProject({
           >
             Transcribe Audio
           </Button>
-          <UploadJSONForm setWords={setWords} />
+          <UploadJSONForm words={words} setWords={setWords} />
         </div>
       </section>
 

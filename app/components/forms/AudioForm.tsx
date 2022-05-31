@@ -6,9 +6,9 @@ import { fileToBase64 } from '../../utils/helpers';
 
 interface Props {
   audio?: FileProps | null;
-  setAudio: Function;
+  setAudio: (v: FileProps | null) => void;
   audioDuration?: number | null;
-  setAudioDuration: Function;
+  setAudioDuration: (v: number | null) => void;
 }
 
 export default function AudioForm({
@@ -30,21 +30,22 @@ export default function AudioForm({
 
   async function processAudio(src: string, setState?: boolean) {
     const audioData = await getAudioData(src);
-    const { numberOfChannels, durationInSeconds } = audioData;
+    const { numberOfChannels, durationInSeconds, sampleRate } = audioData;
 
     if (durationInSeconds > 60) {
       setError('audio', {
         type: 'lessThan1Minute',
         message: 'Audio length must be 1 minute or less',
       });
-      return false;
+      return {};
     }
 
     console.log(`Channels: ${numberOfChannels}`);
+    console.log(audioData);
 
     setAudioDuration(durationInSeconds);
 
-    return durationInSeconds;
+    return { durationInSeconds, sampleRate };
   }
 
   React.useEffect(() => {
@@ -52,12 +53,15 @@ export default function AudioForm({
       if (value?.audio?.length && value.audio[0] instanceof File) {
         const base64 = await fileToBase64(value.audio[0]);
         if (base64) {
-          const _audioDuration = await processAudio(base64 as string);
+          const { durationInSeconds, sampleRate } = await processAudio(
+            base64 as string
+          );
 
-          if (_audioDuration) {
+          if (durationInSeconds) {
             setAudio({
               file: value.audio,
-              base64,
+              base64: base64 as string,
+              sampleRate,
             });
             setFileName(value.audio[0].name);
           }

@@ -36,6 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 secondary: '#fff',
               },
             },
+            duration: 5000,
           }}
         />
       </ModalProvider>

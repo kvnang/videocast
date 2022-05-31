@@ -44,16 +44,23 @@ export default async function handler(
       const f = Array.isArray(file) ? file[0] : file;
       const fullPath = f.filepath;
 
+      const { sampleRate } = fields;
+
       // 2b. Process audio file via Google Cloud Speech-to-Text
+      const audioBuffer = fs.readFileSync(fullPath);
+
       const audio = {
-        content: fs.readFileSync(fullPath).toString('base64'),
+        content: audioBuffer.toString('base64'),
         // uri: 'gs://podcast-video-generator-audio/audio2.mp3',
       };
 
       const request = {
         config: {
           // encoding: 'MP3',
-          sampleRateHertz: 16000,
+          sampleRateHertz:
+            sampleRate && typeof sampleRate === 'string'
+              ? parseInt(sampleRate)
+              : 16000,
           languageCode: 'en-US',
           enableWordTimeOffsets: true,
         },
