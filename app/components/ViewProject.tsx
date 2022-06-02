@@ -161,7 +161,7 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
                         });
                     }}
                   >
-                    Copy Text
+                    Copy Link
                   </Button>
                   <Button href={videoUrl as string} target="_blank" download>
                     Download
