@@ -1,6 +1,6 @@
 import * as React from 'react';
 import toast from 'react-hot-toast';
-import { IoVideocamOutline } from 'react-icons/io5';
+import { IoCopyOutline, IoVideocamOutline } from 'react-icons/io5';
 import { saveProjectToDb } from '../lib/project';
 import { JobProps, ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
@@ -149,7 +149,20 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
                 </table>
               </div>
               {isCompleted && videoUrl && (
-                <div className="mt-8 text-right">
+                <div className="mt-8 text-right flex gap-4 flex-wrap justify-end">
+                  <Button
+                    icon={<IoCopyOutline />}
+                    buttonStyle="secondary"
+                    onClick={() => {
+                      navigator.clipboard
+                        .writeText(videoUrl as string)
+                        .then(() => {
+                          toast.success('Download link copied to clipboard');
+                        });
+                    }}
+                  >
+                    Copy Text
+                  </Button>
                   <Button href={videoUrl as string} target="_blank" download>
                     Download
                   </Button>
