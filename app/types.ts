@@ -40,6 +40,7 @@ export interface ProjectProps {
   outputFile?: string;
   status?: ProjectStatus | null;
   renderData?: RenderData | null;
+  isPublic?: boolean;
 }
 
 export interface ProjectDocument extends ProjectProps {

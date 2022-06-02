@@ -1,6 +1,11 @@
+import { Claims } from '@auth0/nextjs-auth0';
 import * as React from 'react';
 import toast from 'react-hot-toast';
-import { IoCopyOutline, IoVideocamOutline } from 'react-icons/io5';
+import {
+  IoCopyOutline,
+  IoShareSocialOutline,
+  IoVideocamOutline,
+} from 'react-icons/io5';
 import { saveProjectToDb } from '../lib/project';
 import { JobProps, ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
@@ -16,7 +21,13 @@ function ProjectHeader({ project }: { project: ProjectDocument }) {
   );
 }
 
-export default function ViewProject({ project }: { project: ProjectDocument }) {
+export default function ViewProject({
+  project,
+  user,
+}: {
+  project: ProjectDocument;
+  user?: Claims | null;
+}) {
   const [job, setJob] = React.useState<JobProps | null>(null);
   const videoUrl = project?.outputFile || job?.data?.url;
   const isCompleted =
@@ -95,11 +106,47 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
     }
   }, []);
 
+  const [isSharing, setIsSharing] = React.useState(false);
+
+  async function handleShare() {
+    setIsSharing(true);
+
+    try {
+      const userID = user?.sub;
+
+      if (!userID && !project?.isPublic) {
+        toast.error(`Sorry, you're not authorized to share this project`);
+        throw new Error(`Sorry, you're not authorized to share this project`);
+      }
+
+      if (!project?.isPublic) {
+        await fetch('/api/projects', {
+          method: 'PUT',
+          body: JSON.stringify({ _id: project._id, userID, isPublic: true }),
+        });
+      }
+
+      await navigator.clipboard.writeText(
+        `${process.env.NEXT_PUBLIC_URL}/app/view/${project._id}`
+      );
+
+      toast.success(
+        `Link copied to clipboard.${
+          userID ? 'Anyone can now view this project!' : ''
+        }`
+      );
+    } catch (e) {
+      toast.error(`Sorry, we cannot share this project`);
+    } finally {
+      setIsSharing(false);
+    }
+  }
+
   return (
     <section className="container mx-auto">
       <ProjectHeader project={project} />
-      <div className="flex w-full gap-8 mb-16 max-w-4xl mx-auto">
-        <div className="basis-2/3">
+      <div className="flex w-full gap-8 mb-16 max-w-5xl mx-auto">
+        <div className="basis-3/5">
           <div className="relative w-full aspect-square rounded-md flex items-center justify-center z-0">
             <div className="absolute top-0 left-0 w-full h-full">
               <div className="w-full h-full rounded-md overflow-hidden">
@@ -127,7 +174,7 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
             )}
           </div>
         </div>
-        <div className="basis-1/3">
+        <div className="basis-2/5">
           <div className="flex flex-col h-full">
             <div className="bg-slate-800 p-6 rounded-md">
               <div className="flex-1">
@@ -150,19 +197,17 @@ export default function ViewProject({ project }: { project: ProjectDocument }) {
               </div>
               {isCompleted && videoUrl && (
                 <div className="mt-8 text-right flex gap-4 flex-wrap justify-end">
-                  <Button
-                    icon={<IoCopyOutline />}
-                    buttonStyle="secondary"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(videoUrl as string)
-                        .then(() => {
-                          toast.success('Download link copied to clipboard');
-                        });
-                    }}
-                  >
-                    Copy Link
-                  </Button>
+                  {(project.isPublic || user) && (
+                    <Button
+                      icon={<IoShareSocialOutline />}
+                      buttonStyle="secondary"
+                      onClick={() => handleShare()}
+                      loading={isSharing}
+                      loadingText="Sharing project"
+                    >
+                      Share
+                    </Button>
+                  )}
                   <Button href={videoUrl as string} target="_blank" download>
                     Download
                   </Button>

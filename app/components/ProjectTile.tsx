@@ -79,7 +79,7 @@ export function ProjectTile({
           </Link>
           {(isDone || isProcessing) && (
             <a
-              download
+              download={!isProcessing}
               href={project.outputFile || '#'}
               className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
             >
