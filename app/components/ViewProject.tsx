@@ -197,7 +197,7 @@ export default function ViewProject({
               </div>
               {isCompleted && videoUrl && (
                 <div className="mt-8 text-right flex gap-4 flex-wrap justify-end">
-                  {(project.isPublic || user) && (
+                  {(project.isPublic || !!user) && (
                     <Button
                       icon={<IoShareSocialOutline />}
                       buttonStyle="secondary"
