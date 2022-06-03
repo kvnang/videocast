@@ -18,7 +18,7 @@ export interface StylesProps {
 export interface InputProps {
   fps: number;
   styles: StylesProps;
-  words: WordProps;
+  words: WordsProps;
   audio: string;
   image: string;
   audioDuration: number;
@@ -103,8 +103,16 @@ export interface IRecognizeResponse {
   /** RecognizeResponse totalBilledTime */
   totalBilledTime?: IDuration | null;
 }
+export interface WordProps extends IWordInfo {
+  /** Start time in seconds */
+  start?: number;
+  /** End time in seconds */
+  end?: number;
+}
 
-export type WordProps = IWordInfo[][];
+export type WordsProps = IWordInfo[][];
+
+export type FlatWordsProps = IWordInfo[];
 
 export interface JobProps {
   id: number;

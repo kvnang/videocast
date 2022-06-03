@@ -1,6 +1,6 @@
 import type { AwsRegion } from '@remotion/lambda';
 
-export const CF_WORKER_URL = 'https://videocast.kvnang.workers.dev';
+export const CF_WORKER_URL = 'https://api.videocast.app';
 
 export const defaultStyles = {
   textColor: '#FFFFFF',

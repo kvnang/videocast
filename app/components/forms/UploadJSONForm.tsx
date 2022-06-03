@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { WordProps } from '../../types';
+import { WordsProps } from '../../types';
 
 function validateJSON(value: any) {
   const firstWord = value?.[0]?.[0];
@@ -23,8 +23,8 @@ export default function UploadJSONForm({
   words,
   setWords,
 }: {
-  words: WordProps | null;
-  setWords: (v: WordProps | null) => void;
+  words: WordsProps | null;
+  setWords: (v: WordsProps | null) => void;
 }) {
   const {
     register,

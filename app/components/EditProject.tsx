@@ -16,7 +16,7 @@ import ImageForm from './forms/ImageForm';
 import type {
   FileProps,
   IRecognizeResponse,
-  WordProps,
+  WordsProps,
   ProjectDocument,
   ProjectProps,
   StylesProps,
@@ -61,7 +61,7 @@ export default function EditProject({
   const [title, setTitle] = React.useState<string | null>(
     project?.title || null
   );
-  const [words, setWords] = React.useState<WordProps | null>(
+  const [words, setWords] = React.useState<WordsProps | null>(
     defaultProps?.words || null
   );
   const [audio, setAudio] = React.useState<FileProps | null>(
@@ -135,7 +135,7 @@ export default function EditProject({
       }
 
       const allWords = results.reduce(
-        (previousValue: WordProps, currentValue) => {
+        (previousValue: WordsProps, currentValue) => {
           if (currentValue.alternatives && currentValue.alternatives[0].words) {
             previousValue.push(currentValue.alternatives[0].words);
           }

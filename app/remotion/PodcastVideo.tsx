@@ -1,11 +1,19 @@
 import * as React from 'react';
-import { Sequence, Img, AbsoluteFill, useVideoConfig } from 'remotion';
+import {
+  Sequence,
+  Img,
+  AbsoluteFill,
+  useVideoConfig,
+  interpolate,
+  Easing,
+} from 'remotion';
 import { Heading } from './Heading';
 import { Text } from './Text';
 import { TextAudio } from './TextAudio';
 import { flatten } from '../utils/helpers';
-import { FontProps, StylesProps, WordProps } from '../types';
+import { FontProps, StylesProps, WordsProps } from '../types';
 import { useLoadFonts } from './useLoadFonts';
+import { PaginatedSubtitles } from './Subtitles';
 
 const imgStyles = {
   position: 'absolute',
@@ -26,7 +34,7 @@ export function PodcastVideo({
 }: {
   styles: StylesProps;
   fontData?: FontProps;
-  words?: WordProps;
+  words?: WordsProps;
   audio?: string;
   audioDuration?: number;
   image?: string;
@@ -57,12 +65,22 @@ export function PodcastVideo({
           fontFamily={styles.fontFamily}
           textColor={styles.textColor}
         />
-        <Text
+        {/* <Text
           textColor={styles.textColor}
           fontFamily={styles.fontFamily}
           fontSize={styles.fontSize}
           lineHeight={styles.lineHeight}
           words={flatten(words)}
+        /> */}
+        <PaginatedSubtitles
+          textColor={styles.textColor}
+          fontFamily={styles.fontFamily}
+          fontSize={styles.fontSize}
+          lineHeight={styles.lineHeight}
+          words={flatten(words)}
+          startFrame={0}
+          endFrame={0 + durationInFrames}
+          animate
         />
       </Sequence>
       <Sequence from={0} durationInFrames={durationInFrames}>

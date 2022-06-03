@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { WordProps } from '../types';
+import { WordsProps } from '../types';
 
 interface RemoveButtonProps {
   className?: string;
   sentenceIndex: number;
   wordIndex: number;
-  words: WordProps;
-  setWords: (v: WordProps) => void;
+  words: WordsProps;
+  setWords: (v: WordsProps) => void;
   formKey: number;
   setFormKey: (v: number) => void;
 }
@@ -94,8 +94,8 @@ export default function Form({
 }: {
   formKey: number;
   setFormKey: (v: number) => void;
-  words: WordProps;
-  setWords: (v: WordProps | null) => void;
+  words: WordsProps;
+  setWords: (v: WordsProps | null) => void;
 }) {
   const {
     register,
@@ -103,7 +103,7 @@ export default function Form({
     watch,
     getValues,
     formState: { errors },
-  } = useForm<{ words: WordProps }>();
+  } = useForm<{ words: WordsProps }>();
 
   const onSubmit = handleSubmit((data) => console.log(data));
 
