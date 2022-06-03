@@ -1,4 +1,4 @@
-import { InputProps, ProjectProps } from '../types';
+import { InputProps, ProjectProps, RenderData } from '../types';
 
 export async function saveProjectToDb(
   project: ProjectProps,
@@ -45,5 +45,5 @@ export async function bundleProject({
 
   // await saveProjectToDb(newProject);
 
-  return { renderId, bucketName, functionName };
+  return { renderId, bucketName, functionName } as RenderData;
 }

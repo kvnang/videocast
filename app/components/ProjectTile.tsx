@@ -77,17 +77,19 @@ export function ProjectTile({
               )}
             </a>
           </Link>
-          {(isDone || isProcessing) && (
+          {isDone && (
             <a
-              download={!isProcessing}
+              download
               href={project.outputFile || '#'}
               className="inline-flex p-2 h-8 w-8 bg-slate-900 hover:bg-indigo-700 align-items-center justify-center rounded-md transition-colors"
             >
-              {isDone && (
-                <FiDownloadCloud title="Download" className="h-4 w-4" />
-              )}
-              {isProcessing && <Spinner className="h-4 w-4 opacity-50" />}
+              <FiDownloadCloud title="Download" className="h-4 w-4" />
             </a>
+          )}
+          {isProcessing && (
+            <div className="inline-flex p-2 h-8 w-8 bg-slate-900 align-items-center justify-center rounded-md transition-colors">
+              <Spinner className="h-4 w-4 opacity-50" />
+            </div>
           )}
         </div>
       </div>

@@ -7,6 +7,7 @@ type Data = {
   isSettled: boolean;
   outputFile: string | null;
   overallProgress: number;
+  errorMessage?: string | null;
 };
 
 export default async function handler(
@@ -47,6 +48,12 @@ export default async function handler(
     if (progress.fatalErrorEncountered) {
       console.error('Error enountered', progress.errors);
       isSettled = true;
+      res.status(500).json({
+        isSettled,
+        outputFile,
+        overallProgress,
+        errorMessage: 'Video cannot be rendered',
+      });
     }
   } catch (err) {
     res.status(200).json({ isSettled, outputFile, overallProgress });

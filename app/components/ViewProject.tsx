@@ -6,7 +6,7 @@ import {
   IoShareSocialOutline,
   IoVideocamOutline,
 } from 'react-icons/io5';
-import { saveProjectToDb } from '../lib/project';
+import { bundleProject, saveProjectToDb } from '../lib/project';
 import { JobProps, ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
 import { asyncPoll } from '../utils/poll';
@@ -23,15 +23,18 @@ function ProjectHeader({ project }: { project: ProjectDocument }) {
 
 export default function ViewProject({
   project,
+  setProject,
   user,
 }: {
   project: ProjectDocument;
+  setProject?: (v: ProjectDocument) => void;
   user?: Claims | null;
 }) {
   const [job, setJob] = React.useState<JobProps | null>(null);
   const videoUrl = project?.outputFile || job?.data?.url;
   const isCompleted =
     project.outputFile || !!(job?.progress && job.progress === 100);
+  const isError = job?.state === 'error';
 
   async function checkProgress() {
     // 1. Get renderId, bucket, and functionName
@@ -56,20 +59,26 @@ export default function ViewProject({
     });
 
     const checkLambdaProgress = async () => {
-      const { isSettled, outputFile, overallProgress } = await fetch(
-        `/api/renderProgress?renderId=${renderId}&bucketName=${bucketName}&functionName=${functionName}`
-      ).then((r) => r.json());
+      try {
+        const { isSettled, outputFile, overallProgress, errorMessage } =
+          await fetch(
+            `/api/renderProgress?renderId=${renderId}&bucketName=${bucketName}&functionName=${functionName}`
+          ).then((r) => r.json());
 
-      setJob({
-        id: 1,
-        progress: 40 + overallProgress * 50,
-        state: 'progress',
-        data: {
-          message: `Rendering Video ${Math.ceil(overallProgress * 100)}% ...`,
-        },
-      });
+        setJob({
+          id: 1,
+          progress: 40 + overallProgress * 50,
+          state: 'progress',
+          data: {
+            message: `Rendering Video ${Math.ceil(overallProgress * 100)}% ...`,
+          },
+        });
 
-      return { done: isSettled, data: { outputFile } };
+        return { done: isSettled, data: { outputFile, errorMessage } };
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
     };
 
     const data = await asyncPoll(checkLambdaProgress, 5 * 1000, 300 * 1000);
@@ -77,7 +86,16 @@ export default function ViewProject({
     const url = data?.outputFile;
 
     if (!url) {
-      throw new Error('Video cannot be rendered');
+      toast.error(data?.errorMessage || 'Something went wrong');
+      setJob({
+        id: 1,
+        progress: 0,
+        state: 'error',
+        data: {
+          message: data?.errorMessage || 'Something went wrong',
+        },
+      });
+      return;
     }
 
     setJob({
@@ -98,6 +116,21 @@ export default function ViewProject({
 
     // Save project
     saveProjectToDb({ ...project, outputFile: url, status: 'done' });
+  }
+
+  async function reRender() {
+    const renderData = await bundleProject({
+      inputProps: project?.inputProps,
+    });
+    const newProject = await saveProjectToDb({ ...project, renderData }, true);
+
+    if (typeof setProject !== 'undefined') {
+      setProject(newProject);
+    } else {
+      window.location.reload();
+    }
+
+    checkProgress();
   }
 
   React.useEffect(() => {
@@ -157,19 +190,36 @@ export default function ViewProject({
                     controls
                     loop
                   />
-                )) || <div className="w-full h-full top-0 left-0 skeleton" />}
+                )) || (
+                  <div
+                    className={`w-full h-full top-0 left-0 ${
+                      isError ? 'bg-slate-800' : 'skeleton'
+                    }`}
+                  />
+                )}
               </div>
             </div>
             {!isCompleted && (
-              <div className="relative pb-2 mb-8 w-full flex items-center justify-center z-10">
-                <IoVideocamOutline className="opacity-20 h-12 w-12 animate-pulse" />
+              <div className="relative pb-2 mb-8 w-full flex flex-col items-center justify-center z-10">
+                <IoVideocamOutline
+                  className={`opacity-20 h-12 w-12 ${
+                    isError ? 'text-red-500 opacity-100' : 'animate-pulse'
+                  }`}
+                />
                 <p
-                  className="absolute top-full text-center left-0 px-4 w-full"
+                  className={`text-center left-0 mt-2 px-4 w-full ${
+                    isError ? 'text-red-500' : ''
+                  }`}
                   // eslint-disable-next-line react/no-danger
                   dangerouslySetInnerHTML={{
                     __html: job?.data?.message || 'Working on it ...',
                   }}
                 />
+                {isError && (
+                  <p className="text-center left-0 mt-4 px-4 w-full">
+                    <Button onClick={() => reRender()}>Try Again</Button>
+                  </p>
+                )}
               </div>
             )}
           </div>

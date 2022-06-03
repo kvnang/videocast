@@ -108,13 +108,18 @@ export default function EditProject({
       const { name } = await res.json();
 
       const checkRecognizeProgress = async () => {
-        const operation: SpeechProgressResponse = await fetch(
-          `/api/speechProgress?operationName=${name}`
-        ).then((r) => r.json());
-        return {
-          done: operation.done || false,
-          data: operation.result as google.cloud.speech.v1.LongRunningRecognizeResponse,
-        };
+        try {
+          const operation: SpeechProgressResponse = await fetch(
+            `/api/speechProgress?operationName=${name}`
+          ).then((r) => r.json());
+          return {
+            done: operation.done || false,
+            data: operation.result as google.cloud.speech.v1.LongRunningRecognizeResponse,
+          };
+        } catch (err) {
+          toast.error('Something went wrong');
+          throw err;
+        }
       };
 
       const data = await asyncPoll(

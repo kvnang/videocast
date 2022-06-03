@@ -32,7 +32,9 @@ export default function CreatePage({
     <>
       <SEO />
       <main>
-        {(!isDraft && <ViewProject project={project} user={user} />) || (
+        {(!isDraft && (
+          <ViewProject project={project} setProject={setProject} user={user} />
+        )) || (
           <EditProject project={project} user={user} setProject={setProject} />
         )}
       </main>
