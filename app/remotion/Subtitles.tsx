@@ -48,8 +48,7 @@ const ZOOM_MEASURER_SIZE = 10;
 const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
 
 const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
-  if (typeof word.start !== 'number' || word.start < 0) return null;
-  console.log('interpolating', word.start, word.start + 15);
+  if (typeof word.start === 'undefined' || Number.isNaN(word)) return null;
   return (
     <>
       <span
@@ -148,8 +147,8 @@ export function PaginatedSubtitles({
     for (let i = 0; i < subtitles.length; i += 1) {
       const subtitleItem = subtitles[i];
       const shouldSkip =
-        typeof subtitleItem.start === 'number' &&
-        subtitleItem.start >= 0 &&
+        typeof subtitleItem.start !== 'undefined' &&
+        !Number.isNaN(subtitleItem.start) &&
         subtitleItem.start >= frame;
       if (!shouldSkip) {
         finalLines[lineIndex] = [
