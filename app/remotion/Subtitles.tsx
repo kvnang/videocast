@@ -49,6 +49,7 @@ const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
 
 const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
   if (typeof word.start !== 'number' || word.start < 0) return null;
+  console.log('interpolating', word.start, word.start + 15);
   return (
     <>
       <span
