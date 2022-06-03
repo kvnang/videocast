@@ -48,7 +48,8 @@ const ZOOM_MEASURER_SIZE = 10;
 const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
 
 const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
-  if (typeof word.start === 'undefined' || Number.isNaN(word)) return null;
+  if (typeof word.start === 'undefined' || Number.isNaN(word.start))
+    return null;
   return (
     <>
       <span
