@@ -1,4 +1,4 @@
-# [Videocast](https://www.videocast.app)
+<h1><a href="https://www.videocast.app/" target="_blank" rel="noopener noreferrer">Videocast</a></h1>
 
 > Turn your podcast into an engaging video, effortlessly.
 
