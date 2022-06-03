@@ -19,10 +19,10 @@ const useWindowedFrameSubs = (
   return React.useMemo(() => {
     const subsWithFrameNumbers = words.reduce<WordProps[]>((acc, item) => {
       const startInSeconds = parseFloat(
-        `${item.startTime?.seconds}.${item.startTime?.nanos}`
+        `${item.startTime?.seconds || 0}.${item.startTime?.nanos || 0}`
       );
       const endInSeconds = parseFloat(
-        `${item.endTime?.seconds}.${item.endTime?.nanos}`
+        `${item.endTime?.seconds || 0}.${item.endTime?.nanos || 0}`
       );
       const start = Math.floor(startInSeconds * fps);
       const end = Math.floor(endInSeconds * fps);
@@ -48,8 +48,11 @@ const ZOOM_MEASURER_SIZE = 10;
 const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
 
 const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
-  if (typeof word.start === 'undefined' || Number.isNaN(word.start))
+  if (typeof word.start === 'undefined' || Number.isNaN(word.start)) {
+    console.error(`This word is invalid. Skipping:`, word);
     return null;
+  }
+
   return (
     <>
       <span
