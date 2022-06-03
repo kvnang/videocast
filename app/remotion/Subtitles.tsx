@@ -2,12 +2,11 @@ import * as React from 'react';
 import {
   continueRender,
   delayRender,
-  Easing,
-  interpolate,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
 import { FlatWordsProps, WordProps } from '../types';
+import { SubtitlesTrack } from './SubtitlesTrack';
 
 const useWindowedFrameSubs = (
   words: FlatWordsProps,
@@ -45,42 +44,6 @@ const useWindowedFrameSubs = (
 
 const ZOOM_MEASURER_SIZE = 10;
 
-const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
-
-const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
-  if (typeof word.start === 'undefined' || Number.isNaN(word.start)) {
-    console.error(`This word is invalid. Skipping:`, word);
-    return null;
-  }
-
-  return (
-    <>
-      <span
-        style={{
-          display: 'inline-block',
-          backfaceVisibility: 'hidden',
-          opacity: interpolate(frame, [word.start, word.start + 15], [0, 1], {
-            extrapolateLeft: 'clamp',
-            extrapolateRight: 'clamp',
-          }),
-          transform: `perspective(1000px) scale(${interpolate(
-            frame,
-            [word.start, word.start + 15],
-            [0.75, 1],
-            {
-              easing: Easing.out(Easing.quad),
-              extrapolateLeft: 'clamp',
-              extrapolateRight: 'clamp',
-            }
-          )})`,
-        }}
-      >
-        {word.word}
-      </span>{' '}
-    </>
-  );
-};
-
 export function PaginatedSubtitles({
   textColor,
   fontFamily,
@@ -104,6 +67,7 @@ export function PaginatedSubtitles({
   const containerBottom = 200;
   const containerPadding = 40;
   const lineHeightPx = Math.floor(lineHeight * fontSize);
+  const showFullTrack = true;
 
   const frame = useCurrentFrame();
   const windowRef = React.useRef<HTMLDivElement>(null);
@@ -120,19 +84,37 @@ export function PaginatedSubtitles({
   const currentSubtitleItem = subtitles
     .slice()
     .reverse()
-    .find((item) => item.start && item.start < frame);
-
-  const renderSubtitleItem = animate
-    ? renderSubtitleItemAnimated
-    : renderSubtitleItemDefault;
+    .find(
+      (item) =>
+        typeof item.start !== 'undefined' &&
+        !Number.isNaN(item.start) &&
+        (item.start < frame || (item.start === 0 && frame === 0))
+    );
 
   React.useEffect(() => {
+    let linesRendered = 0;
+
     const zoom =
       (zoomMeasurer.current?.getBoundingClientRect().height as number) /
       ZOOM_MEASURER_SIZE;
-    const linesRendered =
-      (windowRef.current?.getBoundingClientRect().height as number) /
-      (lineHeightPx * zoom);
+
+    if (showFullTrack) {
+      const currentSubtitleItemEl =
+        windowRef.current?.querySelector<HTMLSpanElement>(
+          `span[data-frames="${currentSubtitleItem?.start}-${currentSubtitleItem?.end}"]`
+        );
+      if (currentSubtitleItemEl) {
+        linesRendered =
+          (currentSubtitleItemEl.offsetTop +
+            currentSubtitleItemEl.getBoundingClientRect().height) /
+          (lineHeightPx * zoom);
+      }
+    } else {
+      linesRendered =
+        (windowRef.current?.getBoundingClientRect().height as number) /
+        (lineHeightPx * zoom);
+    }
+
     const linesToOffset = Math.max(0, linesRendered - linesPerPage);
 
     if (linesToOffset === lineOffset) {
@@ -227,29 +209,21 @@ export function PaginatedSubtitles({
           textAlign: 'left',
           margin: '0 -10px',
           width: 'calc(100% + 20px)',
+          color: textColor,
         }}
       >
-        {lineSubs
-          .slice(startLine, startLine + linesPerPage)
-          .reduce((subs, item) => [...subs, ...item], [])
-          .map((word) => (
-            <span
-              key={`${word.word}-${word.startTime?.seconds}-${word.startTime?.nanos}`}
-              id={String(
-                `${word.word}-${word.startTime?.seconds}-${word.startTime?.nanos}`
-              )}
-              style={{
-                color: textColor,
-                marginLeft: 10,
-                marginRight: 10,
-                backfaceVisibility: 'hidden',
-                display: 'inline-block',
-                // opacity,
-              }}
-            >
-              {renderSubtitleItem(word, frame)}
-            </span>
-          ))}
+        <SubtitlesTrack
+          words={
+            !showFullTrack
+              ? lineSubs
+                  .slice(startLine, startLine + linesPerPage)
+                  .reduce((subs, item) => [...subs, ...item], [])
+              : subtitles
+          }
+          frame={frame}
+          showFullTrack={showFullTrack}
+          animate={animate}
+        />
       </h1>
       <div
         ref={zoomMeasurer}

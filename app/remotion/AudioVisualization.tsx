@@ -34,7 +34,7 @@ export function AudioVisualizationDefault({ src, accentColor }: Props) {
             left: 0,
             display: 'flex',
             alignItems: 'flex-end',
-            height: 150,
+            height: 100,
             width: '100%',
           }}
         >
@@ -111,7 +111,7 @@ export function AudioVisualizationMirrored({
         left: 0,
         display: 'flex',
         alignItems: 'flex-end',
-        height: 150,
+        height: 100,
         width: '100%',
       }}
     >
