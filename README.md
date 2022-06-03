@@ -1,8 +1,12 @@
-# Videocast
+# [Videocast](https://www.videocast.app)
 
-Turn your podcast into an engaging video, effortlessly.
+> Turn your podcast into an engaging video, effortlessly.
 
-## About Videocast
+## About the Project
+
+Videocast is an open-source project. It allows general users to generate a video from their podcast snippets, and gives extensive control over the subtitles and styles of the video.
+
+**The goal of this app is to automate, as much as possible, the video-generation workflow**, which can be time-consuming in itself.
 
 ### The Repository
 
