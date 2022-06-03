@@ -46,8 +46,9 @@ const useWindowedFrameSubs = (
 const ZOOM_MEASURER_SIZE = 10;
 
 const renderSubtitleItemDefault = (word: WordProps) => <span>{word.word}</span>;
+
 const renderSubtitleItemAnimated = (word: WordProps, frame: number) => {
-  if (typeof word.start === 'undefined' || word.start === null) return null;
+  if (typeof word.start !== 'number' || word.start < 0) return null;
   return (
     <>
       <span
@@ -146,8 +147,8 @@ export function PaginatedSubtitles({
     for (let i = 0; i < subtitles.length; i += 1) {
       const subtitleItem = subtitles[i];
       const shouldSkip =
-        typeof subtitleItem.start !== 'undefined' &&
-        subtitleItem.start !== null &&
+        typeof subtitleItem.start === 'number' &&
+        subtitleItem.start >= 0 &&
         subtitleItem.start >= frame;
       if (!shouldSkip) {
         finalLines[lineIndex] = [

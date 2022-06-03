@@ -1,12 +1,5 @@
 import * as React from 'react';
-import {
-  Sequence,
-  Img,
-  AbsoluteFill,
-  useVideoConfig,
-  interpolate,
-  Easing,
-} from 'remotion';
+import { Sequence, Img, AbsoluteFill, useVideoConfig } from 'remotion';
 import { Heading } from './Heading';
 import { Text } from './Text';
 import { TextAudio } from './TextAudio';
