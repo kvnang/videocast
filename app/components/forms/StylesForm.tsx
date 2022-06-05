@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { CF_WORKER_URL, defaultFonts, defaultStyles } from '../../lib/config';
 import { FontProps, StylesProps } from '../../types';
-import { InputField } from './FormFields';
+import { InputField, RadioFields } from './FormFields';
 
 interface Props {
   styles: StylesProps;
@@ -103,26 +103,6 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
             />
           }
         />
-        {/* <label htmlFor="color">
-          <span className="block mb-2">Color</span>
-          <input
-            id="color"
-            type="text"
-            className="bg-slate-800 border-2 border-slate-800 px-3 py-2 rounded-md w-full focus:border-indigo-500 transition-colors"
-            placeholder="#000000"
-            {...register('textColor', {
-              validate: {
-                validHex: (value) => /^#([0-9A-F]{3}){1,2}$/i.test(`${value}`),
-              },
-            })}
-            aria-invalid={!!errors?.textColor}
-            style={{
-              borderLeft: `3px solid ${
-                getValues('textColor') || 'transparent'
-              }`,
-            }}
-          />
-        </label> */}
       </li>
       <li className="p-2 shrink-0 grow-0 basis-1/2 max-w-[50%]">
         <InputField
@@ -210,6 +190,24 @@ export default function StylesForm({ styles, setStyles, loadedStyles }: Props) {
           id="subtitle"
           placeholder="e.g. Podcast #23"
           name="subtitle"
+        />
+      </li>
+      <li className="p-2 shrink-0 grow-0 basis-1/2 max-w-[50%]">
+        <RadioFields
+          register={register}
+          label="Audio Visualization"
+          id="audioVisualization"
+          name="audioVisualization"
+          fields={[
+            {
+              label: 'Default',
+              value: 'default',
+            },
+            {
+              label: 'Mirrored',
+              value: 'mirrored',
+            },
+          ]}
         />
       </li>
     </ul>

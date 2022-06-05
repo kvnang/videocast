@@ -62,6 +62,8 @@ export function AudioVisualizationDefault({ src, accentColor }: Props) {
                     height: '100%',
                     width: '100%',
                     backgroundColor: accentColor,
+                    borderTopRightRadius: '0.5rem',
+                    borderTopLeftRadius: '0.5rem',
                     borderBottom: `2px solid ${accentColor}`,
                   }}
                 />

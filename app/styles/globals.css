@@ -17,6 +17,15 @@
     @apply border-red-500 focus:border-red-500;
   }
 
+  [type='radio'],
+  [type='checkbox'] {
+    @apply appearance-none inline-block p-0;
+  }
+
+  [type='radio']:checked {
+    background-image: url('data:image/svg+xml;charset=utf-8;base64,PHN2ZyB2aWV3Qm94PScwIDAgMTYgMTYnIGZpbGw9JyNmZmYnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PGNpcmNsZSBjeD0nOCcgY3k9JzgnIHI9JzMnLz48L3N2Zz4=');
+  }
+
   nav [aria-current='page'] {
     @apply bg-slate-900 hover:bg-slate-900;
   }

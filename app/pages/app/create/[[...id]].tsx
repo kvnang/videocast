@@ -54,25 +54,25 @@ export const getServerSideProps: GetServerSideProps = getServerSidePropsWrapper(
       newDraftId && Array.isArray(newDraftId) ? newDraftId[0] : newDraftId;
 
     if (!session?.user) {
-      if (req.cookies.appSession === 'demo') {
-        return {
-          props: {
-            user: {
-              sub: 'demo|1234567890',
-            },
-          },
-        };
-      }
-
+      // if (req.cookies.appSession === 'demo') {
       return {
-        redirect: {
-          permanent: false,
-          destination: `${
-            process.env.AUTH0_BASE_URL
-          }/api/auth/login?returnTo=${absolutizeUrl(resolvedUrl)}`,
+        props: {
+          user: {
+            sub: 'demo|1234567890',
+          },
         },
-        props: {},
       };
+      // }
+
+      // return {
+      //   redirect: {
+      //     permanent: false,
+      //     destination: `${
+      //       process.env.AUTH0_BASE_URL
+      //     }/api/auth/login?returnTo=${absolutizeUrl(resolvedUrl)}`,
+      //   },
+      //   props: {},
+      // };
     }
 
     if (_id && _id !== 'new') {

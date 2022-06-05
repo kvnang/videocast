@@ -3,12 +3,14 @@ import { useForm } from 'react-hook-form';
 import { getAudioData } from '@remotion/media-utils';
 import { FileProps } from '../../types';
 import { fileToBase64 } from '../../utils/helpers';
+import Button from '../Button';
 
 interface Props {
   audio?: FileProps | null;
   setAudio: (v: FileProps | null) => void;
   audioDuration?: number | null;
   setAudioDuration: (v: number | null) => void;
+  isDemo?: boolean;
 }
 
 export default function AudioForm({
@@ -16,6 +18,7 @@ export default function AudioForm({
   setAudio,
   audioDuration,
   setAudioDuration,
+  isDemo,
 }: Props) {
   const {
     register,
@@ -40,12 +43,37 @@ export default function AudioForm({
       return {};
     }
 
-    console.log(`Channels: ${numberOfChannels}`);
-    console.log(audioData);
+    // console.log(`Channels: ${numberOfChannels}`);
+    // console.log(audioData);
 
     setAudioDuration(durationInSeconds);
 
     return { durationInSeconds, sampleRate };
+  }
+
+  async function setDemoAudio() {
+    const audioDemo = await fetch('/sample/audio.mp3').then((res) =>
+      res.blob()
+    );
+    const audioDemoUrl = URL.createObjectURL(audioDemo);
+    const { durationInSeconds, sampleRate } = await processAudio(audioDemoUrl);
+
+    if (durationInSeconds) {
+      // Convert audio Blob to FileList
+      const audioFile = new File([audioDemo], 'audio.mp3', {
+        type: 'audio/mp3',
+      });
+      const audioFileList = new DataTransfer();
+      audioFileList.items.add(audioFile);
+
+      setAudio({
+        file: audioFileList.files,
+        base64: audioDemoUrl,
+        sampleRate,
+      });
+
+      setFileName(audioFile.name);
+    }
   }
 
   React.useEffect(() => {
@@ -123,6 +151,7 @@ export default function AudioForm({
             {errors.audio.message}
           </p>
         )}
+
         {isAudioReady && (
           <div className="flex items-center w-full pt-1 pb-1">
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -152,6 +181,14 @@ export default function AudioForm({
             </span>
           )) || <span>Max 2MB, MP3 only, Max 1 min.</span>}
         </p>
+        {isDemo && !isAudioReady && (
+          <div>
+            <div className="mt-4 mb-4">
+              <em>or</em>
+            </div>
+            <Button onClick={setDemoAudio}>Use Demo Audio</Button>
+          </div>
+        )}
       </div>
     </>
   );

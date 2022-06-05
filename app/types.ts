@@ -4,6 +4,8 @@ export interface FileProps {
   sampleRate?: number | null;
 }
 
+export type AudioVisualizationType = 'default' | 'mirrored';
+
 export interface StylesProps {
   [key: string]: string | number | undefined;
   textColor: string;
@@ -13,6 +15,7 @@ export interface StylesProps {
   lineHeight: number;
   title?: string;
   subtitle?: string;
+  audioVisualization?: AudioVisualizationType;
 }
 
 export interface InputProps {

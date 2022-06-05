@@ -167,7 +167,7 @@ export default function Form({
         >
           {sentence.map((word, j) => (
             <div key={`form-words-group-${i}-${j}`} className="flex-1 group">
-              <div className="relative">
+              <div className="relative group">
                 {j === 0 && (
                   <AddButton
                     className="absolute w-6 h-6 rounded-full top-1/2 -translate-y-1/2 translate-x-1 right-full hover:bg-slate-600 transition-colors"
@@ -206,7 +206,7 @@ export default function Form({
                   position="after"
                 />
               </div>
-              <div className="flex justify-end items-center mt-1 text-sm">
+              <div className="flex justify-end items-center mt-1 text-sm opacity-25 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                 <div className="flex">
                   <input
                     className="rounded-md bg-transparent focus:bg-slate-800 p-1 w-8 text-right"

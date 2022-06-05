@@ -43,3 +43,54 @@ export function InputField({
     </label>
   );
 }
+
+export function RadioFields({
+  register,
+  options,
+  label,
+  showLabel = true,
+  containerStyle,
+  icon,
+  fields,
+  ...props
+}: {
+  register: UseFormRegister<any>;
+  options?: RegisterOptions;
+  label: string;
+  showLabel?: boolean;
+  containerStyle?: React.CSSProperties;
+  icon?: React.ReactNode;
+  name: string;
+  fields: { label: string; value: string }[];
+} & DetailedHTMLProps<
+  InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>) {
+  return (
+    <fieldset className="relative" style={containerStyle}>
+      <legend className={`block mb-2 ${showLabel ? '' : 'sr-only'}`}>
+        {label}
+      </legend>
+      <div className="relative flex flex-wrap gap-8">
+        {fields.map((field) => (
+          <div className="">
+            <label
+              className="flex items-center mb-4"
+              htmlFor={`${props.id}-${field.value}`}
+            >
+              <input
+                className="w-4 h-4 rounded-full text-indigo-600 bg-gray-100 border-gray-300 bg-center bg-no-repeat bg-contain focus:ring-indigo-500 checked:bg-indigo-500 transition-colors"
+                {...props}
+                id={`${props.id}-${field.value}`}
+                type="radio"
+                value={field.value}
+                {...register(props.name, options)}
+              />
+              <span className="ml-2">{field.label}</span>
+            </label>
+          </div>
+        ))}
+      </div>
+    </fieldset>
+  );
+}

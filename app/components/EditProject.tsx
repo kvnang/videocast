@@ -38,6 +38,7 @@ import { bundleProject, saveProjectToDb } from '../lib/project';
 import { asyncPoll } from '../utils/poll';
 import { SpeechProgressResponse } from '../pages/api/speechProgress';
 import { getFontData } from '../lib/cloudflare';
+import DemoModal from './DemoModal';
 
 const DEFAULT_TITLE = 'Untitled Project';
 
@@ -281,32 +282,7 @@ export default function EditProject({
     if (isDemo) {
       setModal({
         modalOpen: true,
-        children: (
-          <div className="bg-slate-900 p-6 rounded-md w-[600px] max-w-full flex flex-col">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">👋 Welcome!</h2>
-              <p className="mb-4">
-                You're viewing this application as a{' '}
-                <strong className="text-shadow">guest</strong>, so you may not
-                be able to{' '}
-                <strong className="text-shadow">save your project</strong> or{' '}
-                <strong className="text-shadow">view the previous ones.</strong>
-              </p>
-              <p>Please log in if you already have an account!</p>
-            </div>
-            <div className="flex justify-end gap-4">
-              <Button href="/api/auth/login" buttonStyle="secondary">
-                Oops, let me log in
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setModal({ modalOpen: false })}
-              >
-                I'm cool!
-              </Button>
-            </div>
-          </div>
-        ),
+        children: <DemoModal />,
       });
     }
   }, []);
@@ -325,6 +301,7 @@ export default function EditProject({
                 setAudio={setAudio}
                 audioDuration={audioDuration}
                 setAudioDuration={setAudioDuration}
+                isDemo={isDemo}
               />
             </li>
           </ul>
@@ -512,11 +489,20 @@ export default function EditProject({
       )}
 
       {isDemo && (
-        <section className="bg-indigo-500 fixed bottom-8 right-8 w-96 -rotate-45 translate-x-[50%] translate-y-[50%]">
+        <button
+          type="button"
+          className="bg-indigo-500 fixed bottom-8 right-8 w-96 -rotate-45 translate-x-[50%] translate-y-[50%] hover:scale-110 transition-transform"
+          onClick={() =>
+            setModal({
+              modalOpen: true,
+              children: <DemoModal />,
+            })
+          }
+        >
           <div className="py-1 text-center">
             <span className="font-bold">DEMO</span>
           </div>
-        </section>
+        </button>
       )}
     </>
   );
