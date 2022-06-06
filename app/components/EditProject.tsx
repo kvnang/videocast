@@ -15,7 +15,6 @@ import AudioForm from './forms/AudioForm';
 import ImageForm from './forms/ImageForm';
 import type {
   FileProps,
-  IRecognizeResponse,
   WordsProps,
   ProjectDocument,
   ProjectProps,
@@ -320,7 +319,7 @@ export default function EditProject({
               !(audio && audioDuration) || transcribeLoading || words?.length
             }
             loading={transcribeLoading}
-            loadingText="Transcribing ..."
+            loadingText="Transcribing ... this might take 10s - 25s"
           >
             Transcribe Audio
           </Button>

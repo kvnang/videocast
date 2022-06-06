@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { getAudioData } from '@remotion/media-utils';
 import { FileProps } from '../../types';
 import Button from '../Button';
+import { CF_WORKER_URL } from '../../lib/config';
 
 interface Props {
   audio?: FileProps | null;
@@ -29,6 +30,7 @@ export default function AudioForm({
   } = useForm();
 
   const [fileName, setFileName] = React.useState<string | null>(null);
+  const [isLoadingDemo, setIsLoadingDemo] = React.useState<boolean>(false);
 
   async function processAudio(src: string) {
     const audioData = await getAudioData(src);
@@ -51,27 +53,35 @@ export default function AudioForm({
   }
 
   const setDemoAudio = async () => {
-    const audioDemo = await fetch('/demo/ted-talk.mp3').then((res) =>
-      res.blob()
-    );
-    const audioDemoUrl = URL.createObjectURL(audioDemo);
-    const { durationInSeconds, sampleRate } = await processAudio(audioDemoUrl);
+    setIsLoadingDemo(true);
 
-    if (durationInSeconds) {
-      // Convert audio Blob to FileList
-      const audioFile = new File([audioDemo], 'audio.mp3', {
-        type: 'audio/mp3',
-      });
-      const audioFileList = new DataTransfer();
-      audioFileList.items.add(audioFile);
+    try {
+      const audioDemoUrl = `${CF_WORKER_URL}/storage/ted-talk.mp3`;
+      const { durationInSeconds, sampleRate } = await processAudio(
+        audioDemoUrl
+      );
 
-      setAudio({
-        file: audioFileList.files,
-        src: audioDemoUrl,
-        sampleRate,
-      });
+      if (durationInSeconds) {
+        // Convert audio Blob to FileList
+        const audioBlob = await fetch(audioDemoUrl).then((res) => res.blob());
+        const audioFile = new File([audioBlob], 'ted-talk.mp3', {
+          type: 'audio/mp3',
+        });
+        const audioFileList = new DataTransfer();
+        audioFileList.items.add(audioFile);
 
-      setFileName(audioFile.name);
+        setAudio({
+          file: audioFileList.files,
+          src: audioDemoUrl,
+          sampleRate,
+        });
+
+        setFileName(audioFile.name);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingDemo(false);
     }
   };
 
@@ -189,7 +199,14 @@ export default function AudioForm({
             <div className="mt-4 mb-4">
               <em>or</em>
             </div>
-            <Button onClick={setDemoAudio}>Use Demo Audio</Button>
+            <Button
+              onClick={setDemoAudio}
+              loading={isLoadingDemo}
+              loadingText="Loading Demo Audio ..."
+              disabled={isLoadingDemo}
+            >
+              Use Demo Audio
+            </Button>
           </div>
         )}
       </div>

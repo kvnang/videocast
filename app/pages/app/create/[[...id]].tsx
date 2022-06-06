@@ -8,7 +8,6 @@ import type { GetServerSideProps } from 'next';
 import EditProject from '../../../components/EditProject';
 import { getProject } from '../../../lib/getProject';
 import { ProjectDocument } from '../../../types';
-import { absolutizeUrl } from '../../../utils/helpers';
 import SEO from '../../../components/Seo';
 import ViewProject from '../../../components/ViewProject';
 
