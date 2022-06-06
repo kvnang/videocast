@@ -6,7 +6,7 @@ module.exports = {
   reactStrictMode: true,
   images: {
     // loader: 'imgix',
-    domains: ['storage.googleapis.com', 's.gravatar.com'],
+    domains: ['storage.googleapis.com', 's.gravatar.com', 'api.videocast.app'],
   },
   typescript: {
     // !! WARN !!

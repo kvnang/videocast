@@ -52,41 +52,46 @@ export const getServerSideProps: GetServerSideProps = getServerSidePropsWrapper(
     const newDraft =
       newDraftId && Array.isArray(newDraftId) ? newDraftId[0] : newDraftId;
 
-    if (!session?.user) {
-      // if (req.cookies.appSession === 'demo') {
-      return {
-        props: {
-          user: {
-            sub: 'demo|1234567890',
-          },
-        },
-      };
-      // }
+    const demoUser = {
+      sub: 'demo|1234567890',
+    };
 
-      // return {
-      //   redirect: {
-      //     permanent: false,
-      //     destination: `${
-      //       process.env.AUTH0_BASE_URL
-      //     }/api/auth/login?returnTo=${absolutizeUrl(resolvedUrl)}`,
-      //   },
-      //   props: {},
-      // };
-    }
+    // if (!session?.user) {
+    // if (req.cookies.appSession === 'demo') {
+    // return {
+    //   props: {
+    //     user: demoUser,
+    //   },
+    // };
+    // }
+
+    // return {
+    //   redirect: {
+    //     permanent: false,
+    //     destination: `${
+    //       process.env.AUTH0_BASE_URL
+    //     }/api/auth/login?returnTo=${absolutizeUrl(resolvedUrl)}`,
+    //   },
+    //   props: {},
+    // };
+    // }
 
     if (_id && _id !== 'new') {
       // 1. fetch project
-      const project = await getProject(_id, session.user.sub);
+      const project = await getProject(_id, session?.user.sub || demoUser.sub);
 
       if (project && Object.keys(project)?.length) {
         return {
-          props: { project, user: session.user },
+          props: { project, user: session?.user || demoUser },
         };
       }
     }
 
     if (newDraft) {
-      const project = await getProject(newDraft, session.user.sub);
+      const project = await getProject(
+        newDraft,
+        session?.user.sub || demoUser.sub
+      );
       const newProject = {
         userID: project.userID,
         title: project.title,
@@ -95,11 +100,11 @@ export const getServerSideProps: GetServerSideProps = getServerSidePropsWrapper(
 
       if (newProject && Object.keys(newProject)?.length) {
         return {
-          props: { project: newProject, user: session.user },
+          props: { project: newProject, user: session?.user || demoUser },
         };
       }
     }
 
-    return { props: { user: session.user } };
+    return { props: { user: session?.user || demoUser } };
   }
 );

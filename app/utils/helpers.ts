@@ -96,3 +96,21 @@ export const shallowCompare = (
 ) =>
   Object.keys(obj1).length === Object.keys(obj2).length &&
   Object.keys(obj1).every((key) => key in obj2 && obj1[key] === obj2[key]);
+
+export async function loadRemoteFile(remoteUrl: string) {
+  const blob = await fetch(remoteUrl).then((response) => response.blob());
+  const url = URL.createObjectURL(blob);
+  const revoke = () => URL.revokeObjectURL(url);
+  return { blob, url, revoke };
+}
+
+export function getFileListFromBlob(
+  blob: Blob,
+  fileName: string,
+  options?: FilePropertyBag
+) {
+  const file = new File([blob], fileName, options);
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  return dataTransfer.files;
+}

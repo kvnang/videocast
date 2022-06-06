@@ -7,6 +7,11 @@ import {
 } from 'remotion';
 import { FlatWordsProps, WordProps } from '../types';
 import { SubtitlesTrack } from './SubtitlesTrack';
+import useDebounce from '../hooks/useDebounce';
+import {
+  calculateLineOffsetTranslate,
+  getCurrentSubtitleItem,
+} from '../lib/subtitles';
 
 const useWindowedFrameSubs = (
   words: FlatWordsProps,
@@ -70,6 +75,7 @@ export function PaginatedSubtitles({
   const showFullTrack = true;
 
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const windowRef = React.useRef<HTMLDivElement>(null);
   const zoomMeasurer = React.useRef<HTMLDivElement>(null);
   const [handle] = React.useState(() => delayRender());
@@ -79,156 +85,105 @@ export function PaginatedSubtitles({
     windowEnd: endFrame,
   });
 
-  const [lineOffset, setLineOffset] = React.useState(0);
+  const [lineOffsetPerFrame, setLineOffsetPerFrame] = React.useState<
+    Record<string, number>
+  >({});
 
-  const currentSubtitleItem = subtitles
-    .slice()
-    .reverse()
-    .find(
-      (item) =>
-        typeof item.start !== 'undefined' &&
-        !Number.isNaN(item.start) &&
-        (item.start < frame || (item.start === 0 && frame === 0))
-    );
+  const debouncedSubtitles = useDebounce(subtitles, 1000);
 
-  React.useEffect(() => {
+  const calculateLinesToOffset = (currentSubtitleItem?: WordProps) => {
+    if (typeof currentSubtitleItem === 'undefined') return 0;
+
     let linesRendered = 0;
 
     const zoom =
       (zoomMeasurer.current?.getBoundingClientRect().height as number) /
       ZOOM_MEASURER_SIZE;
 
-    if (showFullTrack) {
-      const currentSubtitleItemEl =
-        windowRef.current?.querySelector<HTMLSpanElement>(
-          `span[data-frames="${currentSubtitleItem?.start}-${currentSubtitleItem?.end}"]`
-        );
-      if (currentSubtitleItemEl) {
-        linesRendered =
-          (currentSubtitleItemEl.offsetTop +
-            currentSubtitleItemEl.getBoundingClientRect().height) /
-          (lineHeightPx * zoom);
-      }
-    } else {
+    const currentSubtitleItemEl =
+      windowRef.current?.querySelector<HTMLSpanElement>(
+        `span[data-frames="${currentSubtitleItem?.start}-${currentSubtitleItem?.end}"]`
+      );
+    if (currentSubtitleItemEl) {
       linesRendered =
-        (windowRef.current?.getBoundingClientRect().height as number) /
+        (currentSubtitleItemEl.offsetTop +
+          currentSubtitleItemEl.getBoundingClientRect().height) /
         (lineHeightPx * zoom);
     }
 
     const linesToOffset = Math.max(0, linesRendered - linesPerPage);
 
-    if (linesToOffset === lineOffset) {
-      continueRender(handle);
-      return;
-    }
-
-    setLineOffset(linesToOffset);
-    continueRender(handle);
-  }, [frame, handle, linesPerPage]);
-
-  const lineSubs = (() => {
-    const finalLines: WordProps[][] = [];
-    const lineIndex = 0;
-
-    for (let i = 0; i < subtitles.length; i += 1) {
-      const subtitleItem = subtitles[i];
-      const shouldSkip =
-        typeof subtitleItem.start !== 'undefined' &&
-        !Number.isNaN(subtitleItem.start) &&
-        subtitleItem.start >= frame;
-      if (!shouldSkip) {
-        finalLines[lineIndex] = [
-          ...(finalLines[lineIndex] ?? []),
-          subtitleItem,
-        ];
-      }
-    }
-
-    return finalLines;
-  })();
-
-  const currentLineIndex = Math.max(
-    0,
-    lineSubs.findIndex((l) => l.includes(currentSubtitleItem as WordProps))
-  );
-
-  const startLine = Math.max(0, currentLineIndex - (linesPerPage - 1));
-
-  const getLineHeightByOffset = (offset: number) =>
-    `${((offset - 1) / linesPerPage + 1) * linesPerPage * lineHeightPx}`;
-
-  const calculateLineOffsetTranslate = (
-    offset: number,
-    showPrevious?: boolean
-  ) => {
-    if (showPrevious) {
-      return offset * lineHeightPx;
-    }
-    // if offset is 0, then translate to 0
-    // if offset is 1, then translate to 4 x lineHeight
-    // if offset is 5, then translate to 8 x lineHeight
-    // ...etc
-
-    if (offset === 0) {
-      return 0;
-    }
-
-    if ((offset - 1) % linesPerPage === 0) {
-      return getLineHeightByOffset(offset);
-    }
-
-    // Return previous translate
-    const previous = offset - ((offset - 1) % linesPerPage);
-    return getLineHeightByOffset(previous);
+    return linesToOffset;
   };
 
-  const lineOffsetTranslate = React.useCallback(
-    () => calculateLineOffsetTranslate(lineOffset),
-    [lineOffset]
-  );
+  React.useEffect(() => {
+    const obj: Record<string, number> = {};
+
+    // Loop over all frames
+    for (let i = 0; i < durationInFrames; i += 1) {
+      const curr = getCurrentSubtitleItem(debouncedSubtitles, i);
+      const linesToOffset = calculateLinesToOffset(curr);
+      obj[i] = linesToOffset;
+    }
+
+    setLineOffsetPerFrame(obj);
+    continueRender(handle);
+  }, [debouncedSubtitles, linesPerPage]);
+
+  const translateY = `-${calculateLineOffsetTranslate(
+    lineOffsetPerFrame[frame],
+    linesPerPage,
+    lineHeightPx
+  )}px`;
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        overflow: 'hidden',
-        bottom: containerBottom,
-        height: `${linesPerPage * lineHeightPx}px`,
-        padding: `0 ${containerPadding}px`,
-        width: '100%',
-      }}
-    >
-      <h1
-        ref={windowRef}
+    <>
+      {/* <div
         style={{
-          transform: `translateY(-${lineOffsetTranslate()}px)`,
-          fontFamily: fontFamily.replace(/\+/g, ' '),
-          fontSize: fontSize ? `${fontSize}px` : '60px',
-          lineHeight: lineHeightPx ? `${lineHeightPx}px` : '80px',
-          fontWeight: 700,
-          textAlign: 'left',
-          margin: '0 -10px',
-          width: 'calc(100% + 20px)',
-          color: textColor,
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          textAlign: 'right',
         }}
       >
-        <SubtitlesTrack
-          words={
-            !showFullTrack
-              ? lineSubs
-                  .slice(startLine, startLine + linesPerPage)
-                  .reduce((subs, item) => [...subs, ...item], [])
-              : subtitles
-          }
-          frame={frame}
-          showFullTrack={showFullTrack}
-          animate={animate}
-        />
-      </h1>
+        Frame: {frame}
+      </div> */}
       <div
-        ref={zoomMeasurer}
-        style={{ height: ZOOM_MEASURER_SIZE, width: ZOOM_MEASURER_SIZE }}
-      />
-    </div>
+        style={{
+          position: 'absolute',
+          overflow: 'hidden',
+          bottom: containerBottom,
+          height: `${linesPerPage * lineHeightPx}px`,
+          padding: `0 ${containerPadding}px`,
+          width: '100%',
+        }}
+      >
+        <h1
+          ref={windowRef}
+          style={{
+            transform: `translateY(${translateY})`,
+            fontFamily: fontFamily.replace(/\+/g, ' '),
+            fontSize: fontSize ? `${fontSize}px` : '60px',
+            lineHeight: lineHeightPx ? `${lineHeightPx}px` : '80px',
+            fontWeight: 700,
+            textAlign: 'left',
+            margin: '0 -10px',
+            width: 'calc(100% + 20px)',
+            color: textColor,
+          }}
+        >
+          <SubtitlesTrack
+            words={subtitles}
+            frame={frame}
+            showFullTrack={showFullTrack}
+            animate={animate}
+          />
+        </h1>
+        <div
+          ref={zoomMeasurer}
+          style={{ height: ZOOM_MEASURER_SIZE, width: ZOOM_MEASURER_SIZE }}
+        />
+      </div>
+    </>
   );
 }

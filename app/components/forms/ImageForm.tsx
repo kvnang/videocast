@@ -50,7 +50,7 @@ export default function ImageForm({ image, setImage }: Props) {
       <div className="h-24 w-24 relative">
         <label
           htmlFor="upload-image"
-          className="block w-full h-full relative cursor-pointer before:absolute before:w-full before:h-full before:bg-stripes  before:transition-opacity hover:before:opacity-50"
+          className="block w-full h-full relative cursor-pointer before:absolute before:w-full before:h-full before:bg-stripes before:transition-opacity hover:before:opacity-50"
         >
           <input
             id="upload-image"

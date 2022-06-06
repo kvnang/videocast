@@ -4,6 +4,7 @@ import { getAudioData } from '@remotion/media-utils';
 import { FileProps } from '../../types';
 import Button from '../Button';
 import { CF_WORKER_URL } from '../../lib/config';
+import { getFileListFromBlob, loadRemoteFile } from '../../utils/helpers';
 
 interface Props {
   audio?: FileProps | null;
@@ -56,27 +57,31 @@ export default function AudioForm({
     setIsLoadingDemo(true);
 
     try {
-      const audioDemoUrl = `${CF_WORKER_URL}/storage/ted-talk.mp3`;
+      const { blob: audioDemoBlob, url: audioDemoUrl } = await loadRemoteFile(
+        `${CF_WORKER_URL}/storage/ted-talk.mp3`
+      );
+
       const { durationInSeconds, sampleRate } = await processAudio(
         audioDemoUrl
       );
 
       if (durationInSeconds) {
-        // Convert audio Blob to FileList
-        const audioBlob = await fetch(audioDemoUrl).then((res) => res.blob());
-        const audioFile = new File([audioBlob], 'ted-talk.mp3', {
-          type: 'audio/mp3',
-        });
-        const audioFileList = new DataTransfer();
-        audioFileList.items.add(audioFile);
+        const audioFileName = 'ted-talk.mp3';
+        const audioFileList = getFileListFromBlob(
+          audioDemoBlob,
+          audioFileName,
+          {
+            type: 'audio/mp3',
+          }
+        );
 
         setAudio({
-          file: audioFileList.files,
+          file: audioFileList,
           src: audioDemoUrl,
           sampleRate,
         });
 
-        setFileName(audioFile.name);
+        setFileName(audioFileName);
       }
     } catch (err) {
       console.error(err);
