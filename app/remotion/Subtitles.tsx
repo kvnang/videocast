@@ -92,7 +92,7 @@ export function PaginatedSubtitles({
   const debouncedSubtitles = useDebounce(subtitles, 1000);
 
   const calculateLinesToOffset = (currentSubtitleItem?: WordProps) => {
-    if (typeof currentSubtitleItem === 'undefined') return 0;
+    if (typeof currentSubtitleItem === 'undefined') return null;
 
     let linesRendered = 0;
 
@@ -117,17 +117,29 @@ export function PaginatedSubtitles({
   };
 
   React.useEffect(() => {
-    const obj: Record<string, number> = {};
+    const timer = setTimeout(() => {
+      const obj: Record<string, number> = {};
+      let currentLinesToOffset: number = 0;
 
-    // Loop over all frames
-    for (let i = 0; i < durationInFrames; i += 1) {
-      const curr = getCurrentSubtitleItem(debouncedSubtitles, i);
-      const linesToOffset = calculateLinesToOffset(curr);
-      obj[i] = linesToOffset;
-    }
+      // Loop over all frames
+      for (let i = 0; i < durationInFrames; i += 1) {
+        const curr = getCurrentSubtitleItem(debouncedSubtitles, i);
+        const linesToOffset = calculateLinesToOffset(curr);
+        if (linesToOffset !== null) {
+          obj[i] = linesToOffset;
+          currentLinesToOffset = linesToOffset;
+        } else {
+          obj[i] = currentLinesToOffset;
+        }
+      }
 
-    setLineOffsetPerFrame(obj);
-    continueRender(handle);
+      setLineOffsetPerFrame(obj);
+      continueRender(handle);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [debouncedSubtitles, linesPerPage]);
 
   const translateY = `-${calculateLineOffsetTranslate(
