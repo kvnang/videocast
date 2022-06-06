@@ -26,14 +26,14 @@ export async function getPublicAssets({
   let publicImage: string | null = null;
   let publicAudio: string | null = null;
 
-  if (image?.base64?.startsWith('http')) {
-    publicImage = image.base64;
+  if (image?.src?.startsWith('http')) {
+    publicImage = image.src;
   } else if (image?.file) {
     publicImage = await uploadAsset(image.file);
   }
 
-  if (audio?.base64?.startsWith('http')) {
-    publicAudio = audio.base64;
+  if (audio?.src?.startsWith('http')) {
+    publicAudio = audio.src;
   } else if (audio?.file) {
     publicAudio = await uploadAsset(audio.file);
   }

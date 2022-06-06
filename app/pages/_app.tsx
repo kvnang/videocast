@@ -8,6 +8,7 @@ import { ModalProvider } from '../components/ModalContext';
 import 'normalize.css';
 import '@fontsource/cabin/variable.css';
 import '../styles/globals.css';
+import Footer from '../components/Footer';
 // import GlobalStyles from '../styles/GlobalStyles';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -15,8 +16,13 @@ function MyApp({ Component, pageProps }: AppProps) {
     <UserProvider>
       <ModalProvider>
         <NextNProgress color="#6366f1" showOnShallow={false} />
-        <Header />
-        <Component {...pageProps} />
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <div className="flex-1">
+            <Component {...pageProps} />
+          </div>
+          <Footer />
+        </div>
         <Modal />
         <Toaster
           toastOptions={{

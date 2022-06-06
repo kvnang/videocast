@@ -1,6 +1,6 @@
 export interface FileProps {
   file?: FileList | null;
-  base64?: string | null;
+  src?: string | null;
   sampleRate?: number | null;
 }
 

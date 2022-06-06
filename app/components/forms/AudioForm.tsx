@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { getAudioData } from '@remotion/media-utils';
 import { FileProps } from '../../types';
-import { fileToBase64 } from '../../utils/helpers';
 import Button from '../Button';
 
 interface Props {
@@ -31,7 +30,7 @@ export default function AudioForm({
 
   const [fileName, setFileName] = React.useState<string | null>(null);
 
-  async function processAudio(src: string, setState?: boolean) {
+  async function processAudio(src: string) {
     const audioData = await getAudioData(src);
     const { numberOfChannels, durationInSeconds, sampleRate } = audioData;
 
@@ -43,16 +42,16 @@ export default function AudioForm({
       return {};
     }
 
-    // console.log(`Channels: ${numberOfChannels}`);
-    // console.log(audioData);
+    // TODO: Verify number of channels
+    console.log(`Channels: ${numberOfChannels}`);
 
     setAudioDuration(durationInSeconds);
 
     return { durationInSeconds, sampleRate };
   }
 
-  async function setDemoAudio() {
-    const audioDemo = await fetch('/sample/audio.mp3').then((res) =>
+  const setDemoAudio = async () => {
+    const audioDemo = await fetch('/demo/ted-talk.mp3').then((res) =>
       res.blob()
     );
     const audioDemoUrl = URL.createObjectURL(audioDemo);
@@ -68,31 +67,28 @@ export default function AudioForm({
 
       setAudio({
         file: audioFileList.files,
-        base64: audioDemoUrl,
+        src: audioDemoUrl,
         sampleRate,
       });
 
       setFileName(audioFile.name);
     }
-  }
+  };
 
   React.useEffect(() => {
     const subscription = watch(async (value) => {
       if (value?.audio?.length && value.audio[0] instanceof File) {
-        const base64 = await fileToBase64(value.audio[0]);
-        if (base64) {
-          const { durationInSeconds, sampleRate } = await processAudio(
-            base64 as string
-          );
+        const file = value.audio[0];
+        const audioUrl = URL.createObjectURL(file);
+        const { durationInSeconds, sampleRate } = await processAudio(audioUrl);
 
-          if (durationInSeconds) {
-            setAudio({
-              file: value.audio,
-              base64: base64 as string,
-              sampleRate,
-            });
-            setFileName(value.audio[0].name);
-          }
+        if (durationInSeconds) {
+          setAudio({
+            file: value.audio,
+            src: audioUrl,
+            sampleRate,
+          });
+          setFileName(file.name);
         }
       } else {
         setAudio(null);
@@ -103,17 +99,24 @@ export default function AudioForm({
 
   React.useEffect(() => {
     // Whenever audio is updated, validate audio
-    if (audio?.base64) {
-      processAudio(audio.base64 as string);
+    if (audio?.src) {
+      processAudio(audio.src as string);
 
-      if (audio.base64.startsWith('http')) {
-        // setFileName(audio.base64.split('/').pop() || null);
+      if (audio.src.startsWith('http')) {
+        // setFileName(audio.src.split('/').pop() || null);
         setFileName('Audio File' || null);
       }
     }
   }, [audio]);
 
-  const isAudioReady = !errors.audio && audio?.base64;
+  React.useEffect(() => {
+    // Cleanup URL.createObjectURL
+    if (audio?.src && audio.src.startsWith('blob:')) {
+      URL.revokeObjectURL(audio.src);
+    }
+  }, []);
+
+  const isAudioReady = !errors.audio && audio?.src;
 
   return (
     <>
@@ -156,7 +159,7 @@ export default function AudioForm({
           <div className="flex items-center w-full pt-1 pb-1">
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <audio controls className="w-full invert">
-              <source src={audio.base64 as string} type="audio/mpeg" />
+              <source src={audio.src as string} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
             <button

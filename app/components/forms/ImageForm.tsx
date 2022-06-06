@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import Image from 'next/image';
 import { FiUpload } from 'react-icons/fi';
-import { fileToBase64 } from '../../utils/helpers';
 import { FileProps } from '../../types';
 
 interface Props {
@@ -18,19 +17,20 @@ export default function ImageForm({ image, setImage }: Props) {
     setValue,
   } = useForm();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const subscription = watch(async (value, { name, type }) => {
       if (value?.image?.length && value.image[0] instanceof Blob) {
         setLoading(true);
-        const base64 = await fileToBase64(value.image[0]);
-        if (base64) {
-          setImage({
-            file: value.image,
-            base64,
-          });
-        }
+        const file = value.image[0];
+        const fileUrl = URL.createObjectURL(file);
+
+        setImage({
+          file: value.image,
+          src: fileUrl,
+        });
+
         setLoading(false);
       } else {
         setImage(null);
@@ -38,6 +38,12 @@ export default function ImageForm({ image, setImage }: Props) {
     });
     return () => subscription.unsubscribe();
   }, [watch, image, setImage]);
+
+  React.useEffect(() => {
+    if (image?.src && image.src.startsWith('blob:')) {
+      URL.revokeObjectURL(image.src);
+    }
+  }, []);
 
   return (
     <>
@@ -61,9 +67,9 @@ export default function ImageForm({ image, setImage }: Props) {
             })}
           />
           <div className="h-full w-full absolute flex items-center justify-center overflow-hidden">
-            {(image?.base64 && (
+            {(image?.src && (
               <Image
-                src={image.base64}
+                src={image.src}
                 alt=""
                 layout="fill"
                 className="w-full h-full"
@@ -80,7 +86,7 @@ export default function ImageForm({ image, setImage }: Props) {
             )}
           </div>
         </label>
-        {image?.base64 && (
+        {image?.src && (
           <button
             type="button"
             className="absolute top-0 right-0 leading-[0] text-4xl h-8 w-8 flex items-center justify-center"

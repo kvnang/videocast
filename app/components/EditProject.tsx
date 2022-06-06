@@ -66,13 +66,13 @@ export default function EditProject({
     defaultProps?.words || null
   );
   const [audio, setAudio] = React.useState<FileProps | null>(
-    defaultProps?.audio ? { base64: defaultProps.audio } : null
+    defaultProps?.audio ? { src: defaultProps.audio } : null
   );
   const [audioDuration, setAudioDuration] = React.useState<number | null>(
     defaultProps?.audioDuration || null
   );
   const [image, setImage] = React.useState<FileProps | null>(
-    defaultProps?.image ? { base64: defaultProps.image } : null
+    defaultProps?.image ? { src: defaultProps.image } : null
   );
   const [styles, setStyles] = React.useState<StylesProps>(
     defaultProps?.styles || defaultStyles
@@ -328,7 +328,7 @@ export default function EditProject({
         </div>
       </section>
 
-      {!!words?.length && audio?.base64 && audioDuration && (
+      {!!words?.length && audio?.src && audioDuration && (
         <div>
           <section className="container mx-auto mb-16">
             <div>
@@ -427,11 +427,6 @@ export default function EditProject({
               </div>
               <div className="flex-1">
                 <h2 className="text-xl mb-6 font-bold">Video Preview:</h2>
-                <p className="mb-6">
-                  N.B. If audio & video seem out-of-sync, don't worry. The end
-                  product would probably render fine. This issue is still being
-                  worked on.
-                </p>
                 <div style={{ width: '720px' }}>
                   {isMounted && (
                     <Player
@@ -446,9 +441,9 @@ export default function EditProject({
                       inputProps={{
                         styles,
                         words,
-                        audio: audio.base64,
+                        audio: audio.src,
                         audioDuration,
-                        image: image?.base64 || defaultImage,
+                        image: image?.src || defaultImage,
                       }}
                       style={{
                         width: '100%',

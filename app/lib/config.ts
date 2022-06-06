@@ -1,4 +1,5 @@
 import type { AwsRegion } from '@remotion/lambda';
+import { AudioVisualizationType } from '../types';
 
 export const CF_WORKER_URL = 'https://api.videocast.app';
 
@@ -10,6 +11,7 @@ export const defaultStyles = {
   lineHeight: 1.25,
   title: '',
   subtitle: '',
+  audioVisualization: 'mirrored' as AudioVisualizationType,
 };
 
 export const defaultFonts = [{ family: 'Cabin', files: {} }];

@@ -63,6 +63,8 @@ export default async function handler(
               : 16000,
           languageCode: 'en-US',
           enableWordTimeOffsets: true,
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
         },
         audio,
       };

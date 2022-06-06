@@ -1,5 +1,5 @@
 import { DetailedHTMLProps, InputHTMLAttributes } from 'react';
-import { FieldValues, RegisterOptions, UseFormRegister } from 'react-hook-form';
+import { RegisterOptions, UseFormRegister } from 'react-hook-form';
 
 export function InputField({
   register,
@@ -73,13 +73,13 @@ export function RadioFields({
       </legend>
       <div className="relative flex flex-wrap gap-8">
         {fields.map((field) => (
-          <div className="">
+          <div key={`${props.id}-${field.value}`}>
             <label
-              className="flex items-center mb-4"
+              className="flex items-center mb-4 cursor-pointer group"
               htmlFor={`${props.id}-${field.value}`}
             >
               <input
-                className="w-4 h-4 rounded-full text-indigo-600 bg-gray-100 border-gray-300 bg-center bg-no-repeat bg-contain focus:ring-indigo-500 checked:bg-indigo-500 transition-colors"
+                className="w-4 h-4 rounded-full text-indigo-600 bg-gray-100 border-gray-300 bg-center bg-no-repeat bg-contain outline-none focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-2 focus:ring-indigo-500  checked:bg-indigo-500 group-hover:bg-indigo-300 group-hover:checked:bg-indigo-500 cursor-pointer transition-colors"
                 {...props}
                 id={`${props.id}-${field.value}`}
                 type="radio"
