@@ -1,11 +1,7 @@
 import { Claims } from '@auth0/nextjs-auth0';
 import * as React from 'react';
 import toast from 'react-hot-toast';
-import {
-  IoCopyOutline,
-  IoShareSocialOutline,
-  IoVideocamOutline,
-} from 'react-icons/io5';
+import { IoShareSocialOutline, IoVideocamOutline } from 'react-icons/io5';
 import { bundleProject, saveProjectToDb } from '../lib/project';
 import { JobProps, ProjectDocument } from '../types';
 import { formatDate } from '../utils/helpers';
