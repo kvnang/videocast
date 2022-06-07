@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { getAudioData } from '@remotion/media-utils';
-import { IoWarningOutline } from 'react-icons/io5';
+import { IoCloseCircleOutline, IoWarningOutline } from 'react-icons/io5';
 import { FileProps } from '../../types';
 import Button from '../Button';
 import { CF_WORKER_URL } from '../../lib/config';
@@ -26,9 +26,8 @@ export default function AudioForm({
     register,
     watch,
     formState: { errors },
-    setError,
     reset,
-    // handleSubmit,
+    trigger,
   } = useForm();
 
   const [fileName, setFileName] = React.useState<string | null>(null);
@@ -38,14 +37,6 @@ export default function AudioForm({
   async function processAudio(src: string) {
     const audioData = await getAudioData(src);
     const { numberOfChannels, durationInSeconds, sampleRate } = audioData;
-
-    if (durationInSeconds > 60) {
-      setError('audio', {
-        type: 'lessThan1Minute',
-        message: 'Audio length must be 1 minute or less',
-      });
-      return {};
-    }
 
     setChannels(numberOfChannels);
     setAudioDuration(durationInSeconds);
@@ -61,28 +52,20 @@ export default function AudioForm({
         `${CF_WORKER_URL}/storage/ted-talk.mp3`
       );
 
-      const { durationInSeconds, sampleRate } = await processAudio(
-        audioDemoUrl
-      );
+      const { sampleRate } = await processAudio(audioDemoUrl);
 
-      if (durationInSeconds) {
-        const audioFileName = 'ted-talk.mp3';
-        const audioFileList = getFileListFromBlob(
-          audioDemoBlob,
-          audioFileName,
-          {
-            type: 'audio/mp3',
-          }
-        );
+      const audioFileName = 'ted-talk.mp3';
+      const audioFileList = getFileListFromBlob(audioDemoBlob, audioFileName, {
+        type: 'audio/mp3',
+      });
 
-        setAudio({
-          file: audioFileList,
-          src: audioDemoUrl,
-          sampleRate,
-        });
+      setAudio({
+        file: audioFileList,
+        src: audioDemoUrl,
+        sampleRate,
+      });
 
-        setFileName(audioFileName);
-      }
+      setFileName(audioFileName);
     } catch (err) {
       console.error(err);
     } finally {
@@ -99,22 +82,31 @@ export default function AudioForm({
   };
 
   React.useEffect(() => {
-    const subscription = watch(async (value) => {
+    const subscription = watch(async (value, { name }) => {
+      if (name !== 'audio') {
+        return;
+      }
+
+      const result = await trigger('audio');
+
+      if (!result) {
+        return;
+      }
+
       if (value?.audio?.length && value.audio[0] instanceof File) {
         const file = value.audio[0];
         const audioUrl = URL.createObjectURL(file);
-        const { durationInSeconds, sampleRate } = await processAudio(audioUrl);
 
-        if (durationInSeconds) {
-          setAudio({
-            file: value.audio,
-            src: audioUrl,
-            sampleRate,
-          });
-          setFileName(file.name);
-        }
+        const { sampleRate } = await processAudio(audioUrl);
+
+        setAudio({
+          file: value.audio,
+          src: audioUrl,
+          sampleRate,
+        });
+        setFileName(file.name);
       } else {
-        setAudio(null);
+        removeAudio();
       }
     });
     return () => subscription.unsubscribe();
@@ -150,7 +142,9 @@ export default function AudioForm({
         <form className={`w-full ${isAudioReady ? 'hidden' : 'block'}`}>
           <label
             htmlFor="audio-file"
-            className="block bg-slate-800 p-3 rounded-full w-full cursor-pointer border-2 border-slate-800 hover:border-indigo-500 focus:border-indigo-500 transition-colors"
+            className={`block bg-slate-800 p-3 rounded-full w-full cursor-pointer border-2 border-slate-800 hover:border-indigo-500 focus:border-indigo-500 transition-colors ${
+              errors.audio ? 'border-red-500 hover:border-red-600' : ''
+            }`}
           >
             <span className="sr-only">Choose File</span>
             <input
@@ -160,18 +154,28 @@ export default function AudioForm({
               aria-invalid={!!errors.audio}
               accept="audio/mpeg"
               {...register('audio', {
+                required: true,
                 validate: {
-                  lessThan2MB: (files) => files[0]?.size < 2000000 || 'Max 2MB',
                   acceptedFormats: (files) =>
-                    ['audio/mpeg'].includes(files[0]?.type) || 'Only MP3 file',
+                    ['audio/mpeg'].includes(files[0]?.type) ||
+                    'Only MP3 file is accepted',
+                  lessThan2MB: (files) =>
+                    files[0]?.size < 2000000 ||
+                    'File size must be less than 2MB',
+                  lessThan1Minute: async (files) => {
+                    const fileUrl = URL.createObjectURL(files[0]);
+                    const { durationInSeconds } = await getAudioData(fileUrl);
+                    URL.revokeObjectURL(fileUrl);
+                    return (
+                      durationInSeconds < 60 ||
+                      'Audio length must be 1 minute or less'
+                    );
+                  },
                 },
               })}
             />
           </label>
         </form>
-        {errors.audio && (
-          <p className="small mt-4 text-red-500">{errors.audio.message}</p>
-        )}
 
         {isAudioReady && (
           <div className="flex items-center w-full pt-1 pb-1">
@@ -235,10 +239,20 @@ export default function AudioForm({
             </Button>
           </div>
         )}
+        {errors.audio && (
+          <p className="mt-6 text-left text-sm flex text-white bg-red-600 rounded-md p-3 items-center shadow-md">
+            <div className="pr-2 border-r-2 border-r-red-500">
+              <IoCloseCircleOutline className="w-6 h-6" />
+            </div>
+            <span className="pl-2">
+              {errors.audio.message || 'Please select an audio'}
+            </span>
+          </p>
+        )}
         {!!channels && channels > 1 && (
           <p className="mt-6 text-left text-sm flex text-white bg-yellow-600 rounded-md p-3 items-center shadow-md">
-            <div className="mr-2 pr-2 border-r-2 border-r-yellow-500">
-              <IoWarningOutline className="w-8 h-8" />
+            <div className="pr-2 border-r-2 border-r-yellow-500">
+              <IoWarningOutline className="w-6 h-6" />
             </div>
             <span className="pl-2">
               <strong>Transcription might take significantly longer</strong> for
