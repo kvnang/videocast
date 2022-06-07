@@ -165,7 +165,7 @@ export default function ViewProject({
 
       toast.success(
         `Link copied to clipboard.${
-          userID ? 'Anyone can now view this project!' : ''
+          userID ? ' Anyone can now view this project!' : ''
         }`
       );
     } catch (e) {
@@ -188,7 +188,6 @@ export default function ViewProject({
                     className="w-full h-full"
                     src={videoUrl as string}
                     controls
-                    loop
                   />
                 )) || (
                   <div

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { getAudioData } from '@remotion/media-utils';
+import { IoWarningOutline } from 'react-icons/io5';
 import { FileProps } from '../../types';
 import Button from '../Button';
 import { CF_WORKER_URL } from '../../lib/config';
@@ -31,6 +32,7 @@ export default function AudioForm({
   } = useForm();
 
   const [fileName, setFileName] = React.useState<string | null>(null);
+  const [channels, setChannels] = React.useState<number | null>(null);
   const [isLoadingDemo, setIsLoadingDemo] = React.useState<boolean>(false);
 
   async function processAudio(src: string) {
@@ -45,9 +47,7 @@ export default function AudioForm({
       return {};
     }
 
-    // TODO: Verify number of channels
-    console.log(`Channels: ${numberOfChannels}`);
-
+    setChannels(numberOfChannels);
     setAudioDuration(durationInSeconds);
 
     return { durationInSeconds, sampleRate };
@@ -88,6 +88,14 @@ export default function AudioForm({
     } finally {
       setIsLoadingDemo(false);
     }
+  };
+
+  const removeAudio = () => {
+    reset();
+    setAudio(null);
+    setAudioDuration(null);
+    setChannels(null);
+    setFileName(null);
   };
 
   React.useEffect(() => {
@@ -162,12 +170,7 @@ export default function AudioForm({
           </label>
         </form>
         {errors.audio && (
-          <p
-            className="small"
-            style={{ margin: '0.5rem 0 0', color: 'var(--color-error)' }}
-          >
-            {errors.audio.message}
-          </p>
+          <p className="small mt-4 text-red-500">{errors.audio.message}</p>
         )}
 
         {isAudioReady && (
@@ -182,27 +185,45 @@ export default function AudioForm({
               className="text-2xl h-8 w-8 min-w-[2rem] hover:text-indigo-500 border-2 border-transparent leading-none focus:border-indigo-500 rounded-full transition-colors"
               aria-label="Remove Audio"
               onClick={() => {
-                reset();
-                setAudio(null);
-                setAudioDuration(null);
-                setFileName(null);
+                removeAudio();
               }}
             >
               &times;
             </button>
           </div>
         )}
-        <p className="text-center text-white mt-2 text-sm">
+        <ul className="flex flex-wrap items-center justify-center gap-2 text-center text-slate-300 mt-2 text-sm">
           {(isAudioReady && (
-            <span>
-              Duration: {audioDuration ? `${Math.ceil(audioDuration)}s` : 'N/A'}
-            </span>
-          )) || <span>Max 2MB, MP3 only, Max 1 min.</span>}
-        </p>
+            <>
+              <li className="bg-slate-900 px-3 py-1 rounded-full">
+                Duration:{' '}
+                {audioDuration ? `${Math.ceil(audioDuration)}s` : 'N/A'}
+              </li>
+              <li className="bg-slate-900 px-3 py-1 rounded-full">
+                Channels: {channels || 'N/A'}
+              </li>
+            </>
+          )) || (
+            <>
+              <li className="bg-slate-900 px-3 py-1 rounded-full">Max 2MB</li>
+              <li className="bg-slate-900 px-3 py-1 rounded-full">MP3 only</li>
+              <li className="bg-slate-900 px-3 py-1 rounded-full">
+                Max 1 min.
+              </li>
+            </>
+          )}
+        </ul>
         {isDemo && !isAudioReady && (
           <div>
             <div className="mt-4 mb-4">
-              <em>or</em>
+              <div
+                className="relative 
+                before:absolute before:w-[calc(50%-2ch)] before:border-b-2 before:border-slate-700 before:left-0 before:top-1/2 before:-translate-y-[50%] before:-z-10
+                after:absolute after:w-[calc(50%-2ch)] after:border-b-2 after:border-slate-700 after:right-0 after:top-1/2 after:-translate-y-[50%] after:-z-10
+              "
+              >
+                <em>or</em>
+              </div>
             </div>
             <Button
               onClick={setDemoAudio}
@@ -213,6 +234,18 @@ export default function AudioForm({
               Use Demo Audio
             </Button>
           </div>
+        )}
+        {!!channels && channels > 1 && (
+          <p className="mt-6 text-left text-sm flex text-white bg-yellow-600 rounded-md p-3 items-center shadow-md">
+            <div className="mr-2 pr-2 border-r-2 border-r-yellow-500">
+              <IoWarningOutline className="w-8 h-8" />
+            </div>
+            <span className="pl-2">
+              <strong>Transcription might take significantly longer</strong> for
+              multi-channel audio. To transcribe faster, consider converting the
+              audio to mono first.
+            </span>
+          </p>
         )}
       </div>
     </>
