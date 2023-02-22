@@ -159,8 +159,8 @@ export default function AudioForm({
                   acceptedFormats: (files) =>
                     ['audio/mpeg'].includes(files[0]?.type) ||
                     'Only MP3 file is accepted',
-                  lessThan2MB: (files) =>
-                    files[0]?.size < 2000000 ||
+                  lessThan4MB: (files) =>
+                    files[0]?.size < 4 * 1024 * 1024 ||
                     'File size must be less than 2MB',
                   lessThan1Minute: async (files) => {
                     const fileUrl = URL.createObjectURL(files[0]);
