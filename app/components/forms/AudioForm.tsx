@@ -161,7 +161,7 @@ export default function AudioForm({
                     'Only MP3 file is accepted',
                   lessThan4MB: (files) =>
                     files[0]?.size < 4 * 1024 * 1024 ||
-                    'File size must be less than 2MB',
+                    'File size must be less than 4MB',
                   lessThan1Minute: async (files) => {
                     const fileUrl = URL.createObjectURL(files[0]);
                     const { durationInSeconds } = await getAudioData(fileUrl);
