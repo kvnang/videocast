@@ -12,16 +12,16 @@ async function getS3File(
 ) {
   // Initialize connection to S3
   // Signed request may not be necessary if the bucket is public
-  const aws = new AwsClient({
-    accessKeyId: env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-    service: 's3',
-    region: 'us-east-1',
-  });
+  // const aws = new AwsClient({
+  //   accessKeyId: env.AWS_ACCESS_KEY_ID,
+  //   secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+  //   service: 's3',
+  //   region: 'us-east-1',
+  // });
 
   const s3hostname = `https://s3.us-east-1.amazonaws.com`;
-  const signedRequest = await aws.sign(`${s3hostname}/${key}`);
-  const s3Response = await fetch(signedRequest);
+  // const signedRequest = await aws.sign(`${s3hostname}/${key}`);
+  const s3Response = await fetch(`${s3hostname}/${key}`);
 
   if (!s3Response || s3Response.status === 404) {
     return { error: 'Object not found' };
@@ -72,7 +72,9 @@ export async function handleStorage(
       });
     }
     case 'GET': {
+      // console.log('getting object', env.R2);
       const object = await env.R2.get(key);
+      // console.log(object);
 
       // If object is not available on R2, try fetching object from S3
       if (!object) {

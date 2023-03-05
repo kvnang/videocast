@@ -12,23 +12,46 @@ export default {
 
     const url = new URL(request.url);
 
-    // handle /storage/:key route
-    if (patterns.storage.test(url.pathname)) {
-      return handleStorage(request, env, ctx);
-    }
-
     // handle /render/:key route
+    // Don't cache this route
     if (patterns.render.test(url.pathname)) {
       return handleRender(request, env);
     }
 
-    // handle /fonts/:key route
-    if (patterns.fonts.test(url.pathname)) {
-      return handleFonts(request, env);
+    // Construct the cache key from the URL
+    let response: Response | undefined;
+    const cacheKey = new Request(url.toString(), request);
+    const cache = caches.default;
+
+    if (request.method === 'GET') {
+      response = await cache.match(cacheKey);
+
+      if (response) {
+        console.log('Cache hit for', url.pathname);
+        return response;
+      }
     }
 
-    return new Response(`Path not recognized: ${url.pathname}`, {
-      status: 404,
-    });
+    // handle /storage/:key route
+    if (patterns.storage.test(url.pathname)) {
+      response = await handleStorage(request, env, ctx);
+    }
+
+    // handle /fonts/:key route
+    if (patterns.fonts.test(url.pathname)) {
+      response = await handleFonts(request, env);
+    }
+
+    if (!response) {
+      return new Response(`Path not recognized: ${url.pathname}`, {
+        status: 404,
+      });
+    }
+
+    if (request.method === 'GET') {
+      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+    }
+
+    return response;
   },
 };

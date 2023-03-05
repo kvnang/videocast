@@ -1,10 +1,11 @@
-import { Sequence, Img, AbsoluteFill, useVideoConfig } from 'remotion';
+import { Sequence, useVideoConfig } from 'remotion';
 import { Heading } from './Heading';
 import { TextAudio } from './TextAudio';
 import { flatten } from '../utils/helpers';
 import { FontProps, StylesProps, WordsProps } from '../types';
 import { useLoadFonts } from './useLoadFonts';
 import { PaginatedSubtitles } from './Subtitles';
+import { BackgroundImage } from './BackgroundImage';
 
 export function PodcastVideo({
   styles,
@@ -35,22 +36,7 @@ export function PodcastVideo({
 
   return (
     <div style={{ flex: 1, backgroundColor: 'white' }}>
-      {image && (
-        <AbsoluteFill>
-          <Img
-            src={image}
-            alt="Cover"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-        </AbsoluteFill>
-      )}
+      {image && <BackgroundImage src={image} />}
       <Sequence from={0} durationInFrames={Infinity}>
         <Heading
           title={styles.title}
