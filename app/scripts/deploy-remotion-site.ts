@@ -27,6 +27,9 @@ async function saveRenderData({
   functionName: string;
 }) {
   console.log('Saving bucketName, serveUrl, functionName to KV');
+  console.log('bucketName', bucketName);
+  console.log('serveUrl', serveUrl);
+  console.log('functionName', functionName);
 
   if (!CF_WORKER_URL) {
     throw new Error('Cloudflare Worker URL is not defined');
