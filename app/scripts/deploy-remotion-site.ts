@@ -124,7 +124,7 @@ async function deploy() {
   const { functionName } = await deployFunction({
     region,
     timeoutInSeconds: 120,
-    memorySizeInMb: 1024,
+    memorySizeInMb: 2048,
     createCloudWatchLogGroup: true,
     architecture: 'arm64',
     diskSizeInMb: 512,
