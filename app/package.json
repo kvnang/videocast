@@ -15,10 +15,10 @@
     "@auth0/nextjs-auth0": "^1.9.0",
     "@fontsource/cabin": "^4.5.6",
     "@google-cloud/speech": "^4.10.2",
-    "@remotion/cli": "3.0.12",
-    "@remotion/lambda": "3.0.12",
-    "@remotion/media-utils": "3.0.12",
-    "@remotion/player": "3.0.12",
+    "@remotion/cli": "3.3.54",
+    "@remotion/lambda": "3.3.54",
+    "@remotion/media-utils": "3.3.54",
+    "@remotion/player": "3.3.54",
     "dotenv": "^16.0.1",
     "formidable": "^2.0.1",
     "framer-motion": "^6.3.4",
@@ -33,7 +33,7 @@
     "react-hook-form": "^7.31.3",
     "react-hot-toast": "^2.2.0",
     "react-icons": "^4.3.1",
-    "remotion": "3.0.12"
+    "remotion": "3.3.54"
   },
   "devDependencies": {
     "@types/formidable": "^2.0.5",
