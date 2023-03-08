@@ -95,7 +95,7 @@ async function deploy() {
   console.log('Bundling site ...');
 
   const { serveUrl } = await deploySite({
-    entryPoint: path.resolve(process.cwd(), './remotion/index'),
+    entryPoint: path.resolve(process.cwd(), './remotion/index.tsx'),
     bucketName,
     region,
     options: {
