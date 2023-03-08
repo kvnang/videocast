@@ -42,7 +42,7 @@ export default async function handler(
     serveUrl,
     composition: compositionId,
     inputProps,
-    codec: 'h264-mkv',
+    codec: 'h264',
     imageFormat: 'jpeg',
     maxRetries: 1,
     framesPerLambda: 20,
