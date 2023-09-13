@@ -130,6 +130,7 @@ export default async function handler(
         const result = await collection
           .find(params)
           .sort({ updatedAt: -1 })
+          .limit(20)
           .toArray();
         res.status(200).json(result);
       }
