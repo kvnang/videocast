@@ -11,7 +11,7 @@ async function getFonts(env: Env) {
   ).then((r) => r.json());
 
   // Limit to 100 most popular fonts
-  const limitedFonts = allFonts.items.slice(0, 100);
+  const limitedFonts = allFonts.items;
 
   // Re-sort fonts by family name
   const sortedFonts = limitedFonts.sort((a, b) => {
