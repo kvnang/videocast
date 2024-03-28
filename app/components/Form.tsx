@@ -143,10 +143,10 @@ export default function Form({
           return;
         }
 
-        newWords[sentenceIndex][wordIndex][valueType][timeUnit] =
+        newWords[sentenceIndex][wordIndex][valueType]![timeUnit] =
           timeUnit === 'nanos'
             ? convertMsToNanos(fieldValue as number)
-            : fieldValue;
+            : (fieldValue as number);
       }
 
       setWords(newWords);

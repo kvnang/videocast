@@ -1,4 +1,4 @@
-import { renderMediaOnLambda } from '@remotion/lambda';
+import { renderMediaOnLambda } from '@remotion/lambda/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getRenderData } from '../../lib/cloudflare';
 import { region, compositionId } from '../../lib/config';
@@ -47,7 +47,7 @@ export default async function handler(
     maxRetries: 1,
     framesPerLambda: 20,
     privacy: 'public',
-    quality: 100,
+    jpegQuality: 100,
     outName,
     envVariables: {
       NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL || '',

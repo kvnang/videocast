@@ -1,11 +1,7 @@
 import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { StylesProps } from '../../components/forms/StylesForm';
+import type { StylesProps } from '../../types';
 import clientPromise from '../../lib/mongodb';
-
-type Data = {
-  name: string;
-};
 
 export interface TemplateDocument {
   _id: string;
@@ -18,7 +14,7 @@ export interface TemplateDocument {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<any>
 ) {
   const client = await clientPromise;
   const db = client.db();

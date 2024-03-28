@@ -1,5 +1,5 @@
 import type { AwsRegion } from '@remotion/lambda';
-import { AudioVisualizationType } from '../types';
+import type { AudioVisualizationType } from '../types';
 
 export const CF_WORKER_URL = 'https://api.videocast.app';
 

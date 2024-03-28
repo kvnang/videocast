@@ -126,7 +126,7 @@ async function deploy() {
     timeoutInSeconds: 120,
     memorySizeInMb: 2048,
     createCloudWatchLogGroup: true,
-    architecture: 'arm64',
+    // architecture: 'arm64',
     diskSizeInMb: 512,
   });
 
